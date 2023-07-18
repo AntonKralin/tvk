@@ -1,0 +1,40 @@
+{% extends 'tvk/base_generic.html' %}
+
+{% block content %}
+    <div class='container-fluid'>
+    <div class='row'>
+        <div class='col-6'>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered w-auto">
+                    <thead>
+                        <th>Логин</th>
+                        <th>Доступ</th>
+                        <th>Инспекции</th>
+                        <th></th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for i_user in user_list %}
+                            <tr>
+                                <td>{{i_user.username}}</td>
+                                <td>{{i_user.access}}</td>
+                                <td>{{i_user.imns.number}}</td>
+                                <td><a href='{% url "users:change_user" id=i_user.id %}' >Изменить</a></td>
+                                <td><a href='{% url "users:delete_user" id=i_user.id %}' >Удалить</a></td>
+                            <tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class='col-6'>
+            <form action='{%url "users:save_user" %}' method='POST'>
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type='submit' value='Сохранить' />
+            </form>
+        </div>
+    </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'tvk/base_generic.html' %}
+
+{% block content %}
+    <div class='container-fluid'>
+    <div class='row'>
+        <div class='col-6'>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered w-auto">
+                    <thead>
+                        <th>Номер</th>
+                        <th>Название</th>
+                        <th>УНП</th>
+                        <th>Email</th>
+                        <th></th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for i_imns in imns_list.all %}
+                            <tr>
+                                <td title='{{i_imns.address}}'>{{i_imns.number}}</td>
+                                <td title='{{i_imns.name}}'>{{i_imns.shot_name}}</td>
+                                <td title='{{i_imns.post}}'>{{i_imns.unp}}</td>
+                                <td title='{{i_imns.post}}'>{{i_imns.email}}</td>
+                                <td><a href="{%url 'tvk:edit_imns' id=i_imns.id%}">Изменить</a></td>
+                                <td><a href="{%url 'tvk:delete_imns' id=i_imns.id%}">Удалить</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class='col-6'>
+            <form action='{%url "tvk:save_imns" %}' method='POST'>
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type='submit' value='Сохранить' />
+            </form>
+        </div>
+    </div>
+    </div>
+{% endblock %}

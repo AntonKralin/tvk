@@ -1,0 +1,72 @@
+{% extends 'tvk/base_generic.html' %}
+
+{% block content %}
+<div class='container-fluid'>
+    <div class='row'>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered w-auto">
+                <thead>
+                        <th>№</th>
+                        <th>Субъект</th>
+                        <th>Объект контроля</th>
+                        <th>№ отчета</th>
+                        <th>Дата утверждения</th>
+                        <th>Дата с-по</th>
+                        <th>Код риска</th>
+                        <th>Наименование риска</th>
+                        <th>Всего документов</th>
+                        <th>Нарушений</th>
+                        <th>Краткое содержание нарушения</th>
+                        <th>Управление</th>
+                        <th></th>
+                </thead>
+                <tbody>
+                    {% for i_cic in page_obj %}
+                        <tr>
+                            <td>{{i_cic.id}}</td>
+                            <td>{{i_cic.imnss.number}}</td>
+                            <td>{% for i_imns in i_cic.obj.all %}{{i_imns.number}} {%endfor%}</td>
+                            <td>{{i_cic.number}}</td>
+                            <td>{{i_cic.date_state|date:'d.m.Y'}}</td>
+                            <td>{{i_cic.date_from|date:'d.m.Y'}} - {{i_cic.date_to|date:'d.m.Y'}}</td>
+                            <td>{{i_cic.risk.code}}</td>
+                            <td>{{i_cic.risk.name}}</td>
+                            <td>{{i_cic.count_all}}</td>
+                            <td>{{i_cic.count_contravention}}</td>
+                            <td>{{i_cic.point}}</td>
+                            <td>{% for i_dep in i_cic.departments.all %}{{i_dep.name}} {%endfor%}</td>
+                            <td><a href="{%url 'tvk:edit_cic' id=i_cic.id%}">✎</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% block paginator %}
+                <div class='pagination'>
+                    <span class='page-links'>
+                        {% if page_obj.has_previous %}
+                            <a href="{% url 'tvk:p_main' page=page_obj.previous_page_number%}">Предыдущая</a>
+                            {% endif %}
+                            <span class="page-current">
+                                Страница {{page_obj.number}} из {{page_obj.paginator.num_pages}}.
+                            </span>
+                            {% if page_obj.has_next%}
+                            <a href="{% url 'tvk:p_main' page=page_obj.next_page_number%}">Следующая</a>
+                        {% endif %}
+                        {% for page_number in page_obj.paginator.page_range %}
+                            <a
+                                href="{% url 'tvk:p_main' page=page_number%}"
+                                class="{% if page_number == page_obj.number %}current{% endif %}"
+                            >
+                                {{page_number}}
+                            </a>
+                        {% endfor %}
+                    </span>
+                </div>
+                <p></p>
+                <br>
+                <br>
+            {% endblock %}
+    </div>
+</div>
+{% endblock %}

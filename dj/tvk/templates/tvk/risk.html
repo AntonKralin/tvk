@@ -1,0 +1,40 @@
+{% extends 'tvk/base_generic.html' %}
+
+{% block content %}
+    <div class='container-fluid'>
+    <div class='row'>
+        <div class='col-6'>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered w-auto">
+                    <thead>
+                        <th>Код риска</th>
+                        <th>Название риска</th>
+                        <th>Статус</th>
+                        <th></th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for i_risk in risk_list.all %}
+                            <tr>
+                                <td title='{{i_risk.description}}'>{{i_risk.code}}</td>
+                                <td title='{{i_risk.description}}'>{{i_risk.name}}</td>
+                                <td title='{{i_risk.description}}'>{{i_risk.enable}}</td>
+                                <td><a href="{%url 'tvk:edit_risk' id=i_risk.id%}">Изменить</a></td>
+                                <td><a href="{%url 'tvk:delete_risk' id=i_risk.id%}">Удалить</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class='col-6'>
+            <form action='{% url "tvk:save_risk" %}' method='POST'>
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type='submit' value='Сохранить' />
+            </form>
+        </div>
+    </div>
+    </div>
+{% endblock %}
