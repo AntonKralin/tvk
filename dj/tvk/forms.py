@@ -86,7 +86,7 @@ class CICForm(forms.ModelForm):
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
     date_to = forms.DateField(label='Изучаемый периуд по', initial=datetime.date.today,
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    risk = forms.ModelChoiceField(label='Код риска',
+    risk = forms.ModelMultipleChoiceField(label='Код риска',
                                    queryset=Risk.objects.filter(enable=True).order_by('code'))
     count_all = forms.IntegerField(label='Количество документов(фактов), подвергнутых контролю', widget=forms.TextInput(attrs={
         'placeholder':'Количество документов(фактов), подвергнутых контролю',

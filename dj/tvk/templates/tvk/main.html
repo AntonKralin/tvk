@@ -29,8 +29,8 @@
                             <td>{{i_cic.number}}</td>
                             <td>{{i_cic.date_state|date:'d.m.Y'}}</td>
                             <td>{{i_cic.date_from|date:'d.m.Y'}} - {{i_cic.date_to|date:'d.m.Y'}}</td>
-                            <td>{{i_cic.risk.code}}</td>
-                            <td>{{i_cic.risk.name}}</td>
+                            <td>{%for i_risk in i_cic.risk.all%}{{i_risk.code}}, {%endfor%}</td>
+                            <td>{{i_cic.id}}</td>
                             <td>{{i_cic.count_all}}</td>
                             <td>{{i_cic.count_contravention}}</td>
                             <td>{{i_cic.point}}</td>
