@@ -22,4 +22,6 @@ urlpatterns = [
     path('imns/<int:id>', views.imns, name='edit_imns'),
     path('save_imns', views.save_imns, name='save_imns'),
     path('delete_imns/<int:id>', views.delete_imns, name='delete_imns'),
+    path('choose_period', views.choose_period, name='choose_period'),
+    path('report', views.report, name='report'),
 ]

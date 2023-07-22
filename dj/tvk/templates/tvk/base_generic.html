@@ -22,7 +22,7 @@
                 {% if user.access < 5 %}
                     <a class="navbar-brand" href="{%url 'tvk:cic' %}">Создать ТВК</a>
                 {% endif %}
-                <a class="navbar-brand" href="/report">Отчеты</a>
+                <a class="navbar-brand" href="{% url 'tvk:choose_period' %}">Отчеты</a>
             </ul>
 
             <form class="d-flex">

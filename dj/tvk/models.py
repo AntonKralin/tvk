@@ -54,5 +54,8 @@ class CIC(models.Model):
     
     objects = models.Manager()
     
+    def __str__(self) -> str:
+        return "id:" + str(self.id)
+    
     
     
