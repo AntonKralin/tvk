@@ -3,7 +3,8 @@ from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .models import Department, Risk, Imns, CIC
-from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm
+from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm, UploadRiskFileForm
+from .function import handle_upload_file, update_risk
 
 
 # Create your views here.
@@ -91,6 +92,7 @@ def delete_department(request:HttpRequest, id:int=None):
 @login_required
 def risk(request:HttpRequest, id:int=None):
     risk_form = RiskForm()
+    file_form = UploadRiskFileForm()
     
     risk_list = Risk.objects.order_by('-enable', 'code')
     
@@ -99,6 +101,7 @@ def risk(request:HttpRequest, id:int=None):
         risk_form = RiskForm(instance=risk)
     
     context = {'form': risk_form,
+               'file_form': file_form,
                'risk_list': risk_list}
     
     return render(request, 'tvk/risk.html', context=context)
@@ -124,6 +127,18 @@ def delete_risk(request:HttpRequest, id:int=None):
     if id:
         risk = Risk.objects.get(id=id)
         risk.delete()
+    return redirect('tvk:risk')
+
+@login_required
+def upload_file(request:HttpRequest):
+    if request.method == 'POST':
+        file_form = UploadRiskFileForm(request.POST, request.FILES)
+        if file_form.is_valid():
+            list = handle_upload_file(request.FILES['file'])
+            if list:
+                update_risk(list)
+        else:
+            return HttpResponse(str(file_form.errors))
     return redirect('tvk:risk')
 
 @login_required

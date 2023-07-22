@@ -27,7 +27,7 @@ class RiskForm(forms.ModelForm):
     description = forms.CharField(label='Описание риска', widget=forms.Textarea(attrs={
         'placeholder':'Описание',
         'class':'form-control'
-    }))
+    }), required=False)
     enable = forms.BooleanField(label='Активен', initial=True, required=False)
     class Meta:
         model = Risk
@@ -87,7 +87,8 @@ class CICForm(forms.ModelForm):
     date_to = forms.DateField(label='Изучаемый периуд по', initial=datetime.date.today,
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
     risk = forms.ModelMultipleChoiceField(label='Код риска',
-                                   queryset=Risk.objects.filter(enable=True).order_by('code'))
+                                   queryset=Risk.objects.filter(enable=True).order_by('code'),
+                                   widget=forms.CheckboxSelectMultiple(attrs={'class': 'several-columns'}))
     count_all = forms.IntegerField(label='Количество документов(фактов), подвергнутых контролю', widget=forms.TextInput(attrs={
         'placeholder':'Количество документов(фактов), подвергнутых контролю',
         'class':'form-control'
@@ -108,6 +109,9 @@ class CICForm(forms.ModelForm):
         fields = ['id', 'imnss', 'obj', 'number', 'date_state', 'date_from', 
                   'date_to', 'risk', 'count_all', 'count_contravention', 'point', 'departments']
         
+
+class UploadRiskFileForm(forms.Form):
+    file = forms.FileField(widget=forms.FileInput(attrs={'accept': ".csv"}))
 
 class FilterForm(forms.Form):
     number = forms.IntegerField(initial=None, required=False, widget=forms.TextInput(attrs={

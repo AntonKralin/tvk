@@ -1,6 +1,7 @@
 {% extends 'tvk/base_generic.html' %}
 
 {% block content %}
+
     <div class='container-fluid'>
     <div class='row'>
         <div class='col-6'>
@@ -25,6 +26,8 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <br>
+                <br>
             </div>
         </div>
 
@@ -34,6 +37,17 @@
                 {{form.as_p}}
                 <input type='submit' value='Сохранить' />
             </form>
+            <div>
+                <p></p>
+                <p class="text-center">Для загрузки необходим файл *.csv в кодировке UTF-8, в котором будут 2 столбца(без заголовка/шапки): код риска и название</p>
+                <p class="text-center">Разделитель полей - ;</p>
+                <p class="text-center">Разделитель строк - "</p>
+                <form action="{% url 'tvk:upload_file'%}" enctype="multipart/form-data" method='POST'>
+                    {% csrf_token %}
+                    {{file_form.as_p}}
+                    <input type='submit' value='Загрузить' />
+                </form>
+            </div>
         </div>
     </div>
     </div>
