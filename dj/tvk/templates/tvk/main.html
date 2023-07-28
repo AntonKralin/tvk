@@ -15,8 +15,8 @@
                         <th>Код риска</th>
                         <th>Всего документов</th>
                         <th>Нарушений</th>
-                        <th>Краткое содержание нарушения</th>
                         <th>Управление</th>
+                        <th></th>
                         <th></th>
                 </thead>
                 <tbody>
@@ -33,9 +33,9 @@
                             </td>
                             <td>{{i_cic.count_all}}</td>
                             <td>{{i_cic.count_contravention}}</td>
-                            <td>{{i_cic.point}}</td>
                             <td>{% for i_dep in i_cic.departments.all %}{{i_dep.name}} {%endfor%}</td>
                             <td><a href="{%url 'tvk:edit_cic' id=i_cic.id%}">✎</a></td>
+                            <td><a href="{%url 'tvk:edit_cic' id=i_cic.id%}">🔎</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

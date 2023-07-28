@@ -78,7 +78,7 @@ def save_user(request:HttpRequest):
                 user.access = access
                 user.imns = imns
                 user.save()
-                user.set_password = pass1
+                user.set_password(pass1)
                 user.save()
                 return redirect('users:users')
         else:
