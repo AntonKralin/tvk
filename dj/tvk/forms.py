@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import F
 from .models import Department, Risk, Imns, CIC
 import datetime
 
@@ -75,16 +76,16 @@ class CICForm(forms.ModelForm):
     imnss = forms.ModelChoiceField(label='Код ИМНС субъекта(кто проверяет)',
                                    queryset=Imns.objects.order_by('number'))
     obj = forms.ModelMultipleChoiceField(label='Код ИМНС объекта(кого проверяют)',
-                                         queryset=Imns.objects.order_by('number'))
+                                         queryset=Imns.objects.order_by('number').exclude(number=300) )
     number = forms.CharField(label='№ утвержденного отчета', widget=forms.TextInput(attrs={
         'placeholder':'№ утвержденного отчета',
         'class':'form-control'
     }))
     date_state = forms.DateField(label='Дата утвержденного отчета', initial=datetime.date.today,
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    date_from = forms.DateField(label='Изучаемый периуд с', initial=datetime.date.today,
+    date_from = forms.DateField(label='Изучаемый период с', initial=datetime.date.today,
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    date_to = forms.DateField(label='Изучаемый периуд по', initial=datetime.date.today,
+    date_to = forms.DateField(label='Изучаемый период по', initial=datetime.date.today,
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
     risk = forms.ModelMultipleChoiceField(label='Код риска',
                                    queryset=Risk.objects.filter(enable=True).order_by('code'),
@@ -102,7 +103,7 @@ class CICForm(forms.ModelForm):
         'class':'form-control',
         'rows' : '3'
     }))
-    departments = forms.ModelMultipleChoiceField(label='Код ИМНС объекта(кого проверяют)',
+    departments = forms.ModelMultipleChoiceField(label='Управление субъекта(кто проверяет)',
                                          queryset=Department.objects.all())
     class Meta:
         model = CIC

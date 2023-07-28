@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import F
 from .models import Department, Risk, Imns, CIC
 from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm, UploadRiskFileForm, ChoosePeriodForm
 from .function import handle_upload_file, update_risk
