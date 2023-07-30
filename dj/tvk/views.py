@@ -91,6 +91,16 @@ def view_cic(request:HttpRequest, id:int):
     return redirect('tvk:main')
 
 @login_required
+def delete_cic(request:HttpRequest, id:int):
+    if id:
+        cic = CIC.objects.get(id=id)
+        exam_list = Examination.objects.filter(cic=cic)
+        for i_exam in exam_list:
+            i_exam.delete()
+        cic.delete()
+    return redirect('tvk:main')
+
+@login_required
 def department(request:HttpRequest, id:int=None):
     dep_form = DepartmentsForm()
     department_list = Department.objects.all()
@@ -226,7 +236,7 @@ def report(request:HttpRequest):
         date_to = request.POST.get('date_to', None)
         
         departments = Department.objects.all()
-        imns = Imns.objects.order_by('number')
+        imns = Imns.objects.order_by('number').exclude(number=300)
         
         rez = []
         count = 1
@@ -236,7 +246,7 @@ def report(request:HttpRequest):
             buf_rez.append(str(i_imns.shot_name))
             buf_rez.append(str(i_imns.number))
             
-            b_cic =  CIC.objects.filter(imnss=i_imns).exclude(count_contravention=0)
+            b_cic =  CIC.objects.all()
             if date_from:
                 b_cic = b_cic.filter(date_state__gte=date_from)
             if date_to:
@@ -253,10 +263,10 @@ def report(request:HttpRequest):
                 c1 = 0
                 c2 = 0
                 for i_cic in dep_filt:                    
-                    c1 += 1
-                    c2 += i_cic.risk.count()
-                    #удаляем если он встречается еще в одном подразделении
-                    b_cic = b_cic.exclude(id=i_cic.id)
+                    exam = Examination.objects.filter(obj=i_imns, cic=i_cic).exclude(count_contravention=0)
+                    c2 = exam.count()
+                    if c2 != 0:
+                        c1 += 1
                 rez_dep.append(c1)
                 rez_dep.append(c2)
             
@@ -301,6 +311,10 @@ def report(request:HttpRequest):
 @login_required
 def exam(request:HttpRequest, cic:int, id:int=None):
     form = ExaminationForm()
+    
+    user = request.user
+    if user.access != 1:
+        form.fields['obj'].queryset = Imns.objects.filter(id=user.imns.id)
     
     if id:
         exam = Examination.objects.get(id=id)

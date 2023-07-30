@@ -15,6 +15,9 @@
         {% if form.id.value != ''%}
             <a href="{%url 'tvk:exam' cic=form.id.value %}" >Проверки</a>
         {% endif %}
+        {% if user.access == 1 %}
+            <a href="{%url 'tvk:delete_cic' id=form.id.value %}" >Удалить</a>
+        {% endif %}
     </div>
     </div>
 {% endblock %}

@@ -10,6 +10,7 @@ urlpatterns = [
     path('cic/<int:id>', views.cic, name='edit_cic'),
     path('save_cic', views.save_cic, name='save_cic'),
     path('view_cic/<int:id>', views.view_cic, name='view_cic'),
+    path('delete_cic/<int:id>', views.delete_cic, name='delete_cic'),
     path('department', views.department, name='department'),
     path('department/<int:id>', views.department, name='edit_department'),
     path('save_department', views.save_department, name='save_department'),
