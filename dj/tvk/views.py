@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import F
-from .models import Department, Risk, Imns, CIC
-from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm, UploadRiskFileForm, ChoosePeriodForm
+from django.db.models import Sum
+from .models import Department, Risk, Imns, CIC, Examination
+from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm, UploadRiskFileForm, ChoosePeriodForm, ExaminationForm
 from .function import handle_upload_file, update_risk
 
 
@@ -17,6 +17,27 @@ def main(request:HttpRequest, page:int=1):
         cic_list = CIC.objects.order_by('-id')
     else:
         cic_list = CIC.objects.filter(imnss=user.imns.id).order_by('-id')
+        
+    for i_cic in cic_list:
+        exam_list = Examination.objects.filter(cic=i_cic.id)
+        
+        sum_all = exam_list.aggregate(Sum('count_all'))
+        i_cic.sum_all = sum_all['count_all__sum'] if sum_all['count_all__sum'] else 0 
+        sum_cont = exam_list.aggregate(Sum('count_contravention'))
+        i_cic.sum_cont = sum_cont['count_contravention__sum'] if sum_cont['count_contravention__sum'] else 0 
+        
+        obj_list_buf = exam_list.values('obj').distinct()
+        obj_list = []
+        for i_obj in obj_list_buf:
+            obj_list.append(Imns.objects.get(id=i_obj['obj']))
+        i_cic.obj_list= obj_list
+        risk_list_buf = exam_list.values('risk').distinct()
+        risk_list = []
+        for i_risk in risk_list_buf:
+            risk_list.append(Risk.objects.get(id=i_risk['risk']))
+        i_cic.risk_list = risk_list
+        
+        i_cic.exam_list = exam_list
     
     paginator = Paginator(cic_list, 10)
     page_obj = paginator.get_page(page)
@@ -36,7 +57,6 @@ def cic(request:HttpRequest, id:int=None):
     
     if user.access == 2 or user.access == 4:
         cic_form.fields['imnss'].queryset = Imns.objects.filter(id=user.imns.id)
-        cic_form.fields['obj'].queryset = Imns.objects.filter(id=user.imns.id)
     
     context = {'form': cic_form}
     
@@ -55,6 +75,19 @@ def save_cic(request:HttpRequest):
             cic_form.save()
         else:
             return HttpResponse(str(cic_form.errors))
+    return redirect('tvk:main')
+
+@login_required
+def view_cic(request:HttpRequest, id:int):
+    if id:
+        
+        cic = CIC.objects.get(id=id)
+        exam_list = Examination.objects.filter(cic=cic)
+        
+        context = {'cic': cic,
+                   'exam_list': exam_list}
+        
+        return render(request, 'tvk/view_cic.html', context=context)
     return redirect('tvk:main')
 
 @login_required
@@ -262,5 +295,65 @@ def report(request:HttpRequest):
                    'rezult': rez}
 
         return render(request, 'tvk/report.html', context=context)
+    
+    return redirect('tvk:main')
+
+@login_required
+def exam(request:HttpRequest, cic:int, id:int=None):
+    form = ExaminationForm()
+    
+    if id:
+        exam = Examination.objects.get(id=id)
+        form.fields['id'].initial = exam.id
+        form.fields['obj'].initial = exam.obj
+        form.fields['cic'].initial = cic
+        form.fields['risk'].initial = exam.risk
+        form.fields['count_all'].initial = exam.count_all
+        form.fields['count_contravention'].initial = exam.count_contravention
+        form.fields['description'].initial = exam.description
+    else:
+        form.fields['cic'].initial = cic
+        
+    exam_list = Examination.objects.filter(cic=CIC.objects.get(id=cic))
+    
+    context = {'form': form,
+               'exam_list': exam_list}
+    
+    return render(request, 'tvk/exam.html', context=context)
+
+@login_required
+def save_exam(request:HttpRequest):
+    if request.method == 'POST':
+        id = request.POST.get('id', '')
+        obj = request.POST.get('obj')
+        risk = request.POST.get('risk')
+        cic = request.POST.get('cic')
+        count_all = request.POST.get('count_all')
+        count_contravention = request.POST.get('count_contravention')
+        description = request.POST.get('description')
+        
+        exam = Examination()
+        if id != '':
+            exam = Examination.objects.get(id=id)
+            
+        exam.obj = Imns.objects.get(id=obj)
+        exam.risk = Risk.objects.get(id=risk)
+        exam.cic = CIC.objects.get(id=cic)
+        exam.count_all = count_all
+        exam.count_contravention = count_contravention
+        exam.description = description
+        exam.save()
+        
+        return redirect('tvk:exam', cic=cic)
+
+    return redirect('tvk:main')
+
+@login_required
+def delete_exam(request:HttpRequest, id:int=None):
+    if id:
+        exam = Examination.objects.get(id=id)
+        cic = exam.cic.id
+        exam.delete()
+        return redirect('tvk:exam', cic=cic)
     
     return redirect('tvk:main')

@@ -1,6 +1,6 @@
 from django import forms
 from django.db.models import F
-from .models import Department, Risk, Imns, CIC
+from .models import Department, Risk, Imns, CIC, Examination
 import datetime
 
 
@@ -75,8 +75,6 @@ class CICForm(forms.ModelForm):
     id = forms.CharField(widget=forms.HiddenInput(), required=False, initial='')
     imnss = forms.ModelChoiceField(label='Код ИМНС субъекта(кто проверяет)',
                                    queryset=Imns.objects.order_by('number'))
-    obj = forms.ModelMultipleChoiceField(label='Код ИМНС объекта(кого проверяют)',
-                                         queryset=Imns.objects.order_by('number').exclude(number=300) )
     number = forms.CharField(label='№ утвержденного отчета', widget=forms.TextInput(attrs={
         'placeholder':'№ утвержденного отчета',
         'class':'form-control'
@@ -87,28 +85,43 @@ class CICForm(forms.ModelForm):
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
     date_to = forms.DateField(label='Изучаемый период по', initial=datetime.date.today,
                                  widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    risk = forms.ModelMultipleChoiceField(label='Код риска',
-                                   queryset=Risk.objects.filter(enable=True).order_by('code'),
-                                   widget=forms.CheckboxSelectMultiple(attrs={'class': 'several-columns'}))
-    count_all = forms.IntegerField(label='Количество документов(фактов), подвергнутых контролю', widget=forms.TextInput(attrs={
-        'placeholder':'Количество документов(фактов), подвергнутых контролю',
-        'class':'form-control'
-    }))
-    count_contravention = forms.IntegerField(label='Количество документов(фактов), в отношении которых установлены нарушения', widget=forms.TextInput(attrs={
-        'placeholder':'Количество документов(фактов), в отношении которых установлены нарушения',
-        'class':'form-control'
-    }))
-    point = forms.CharField(label='Краткое содержание(суть), нарушения', widget=forms.Textarea(attrs={
-        'placeholder':'Краткое содержание(суть), нарушения',
-        'class':'form-control',
-        'rows' : '3'
-    }))
+    message = forms.CharField(label='Направлено обзорное письмо', widget=forms.TextInput(attrs={
+                                  "placeholder": 'Направлено обзорное письмо',
+                                  'class': 'form-control'
+                                  }), required=False, initial=None)
     departments = forms.ModelMultipleChoiceField(label='Управление субъекта(кто проверяет)',
-                                         queryset=Department.objects.all())
+                                         queryset=Department.objects.all(), widget=forms.SelectMultiple(attrs={
+                                             'class': 'form-control',
+                                             'size': 15
+                                         }))
     class Meta:
         model = CIC
-        fields = ['id', 'imnss', 'obj', 'number', 'date_state', 'date_from', 
-                  'date_to', 'risk', 'count_all', 'count_contravention', 'point', 'departments']
+        fields = ['id', 'imnss', 'number', 'date_state', 'date_from', 
+                  'date_to', 'message', 'departments']
+        
+class ExaminationForm(forms.ModelForm):
+    id = forms.CharField(initial='', widget=forms.HiddenInput(), required=False)
+    cic = forms.IntegerField(widget=forms.HiddenInput())
+    obj = forms.ModelChoiceField(label='Объект', queryset=Imns.objects.order_by('number').exclude(number=300))
+    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code'))
+    count_all = forms.IntegerField(label='Количество документов подвегрнутых контролю', 
+                                   widget=forms.TextInput(attrs={
+                                    "placeholder": 'Количество документов подвегрнутых контролю',
+                                    'class': 'form-control'
+                                    }))
+    count_contravention = forms.IntegerField(label='Количество нарушений', widget=forms.TextInput(attrs={
+                                            "placeholder": 'Количество документов подвегрнутых контролю',
+                                            'class': 'form-control'
+                                            }), initial=0)
+    description = forms.CharField(label='Краткое содержание нарушения', widget=forms.Textarea(attrs={
+                                'placeholder':'Краткое содержание нарушения',
+                                'class':'form-control'
+                                }), required=False)
+    
+    class Meta:
+        model = Examination
+        fields = ['id', 'cic', 'obj', 'risk', 'count_all', 
+                  'count_contravention', 'description']
         
 
 class UploadRiskFileForm(forms.Form):
@@ -121,32 +134,3 @@ class ChoosePeriodForm(forms.Form):
     date_to = forms.DateField(label='Период по', required=False, initial=None,
                               widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
     
-
-class FilterForm(forms.Form):
-    number = forms.IntegerField(initial=None, required=False, widget=forms.TextInput(attrs={
-        'size': '1'
-    }))
-    imnss = forms.CharField(initial=None, required=False, widget=forms.TextInput(attrs={
-        'size': '1'
-    }))
-    report = forms.CharField(initial=None, required=False, widget=forms.TextInput(attrs={
-        'size': '4'
-    }))
-    date_state = forms.DateField(initial=None, required=False, 
-                                 widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    date_from = forms.DateField(initial=None, required=False, 
-                                 widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    date_to = forms.DateField(initial=None, required=False, 
-                                 widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    code = forms.CharField(initial=None, required=False, widget=forms.TextInput(attrs={
-        'size': '1'
-    }))
-    count_all = forms.IntegerField(initial=None, required=False, widget=forms.TextInput(attrs={
-        'size': '3'
-    }))
-    count_con = forms.IntegerField(initial=None, required=False, widget=forms.TextInput(attrs={
-        'size': '3'
-    }))
-    department = forms.CharField(initial=None, required=False, widget=forms.TextInput(attrs={
-        'size': '15'
-    }))

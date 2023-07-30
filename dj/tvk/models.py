@@ -40,16 +40,12 @@ class Imns(models.Model):
     
     
 class CIC(models.Model):
-    imnss = models.ForeignKey(Imns, on_delete=models.CASCADE)
-    obj = models.ManyToManyField(Imns, related_name='obj')
+    imnss = models.ForeignKey(Imns, on_delete=models.PROTECT)
     number = models.CharField(max_length=255, blank=True, null=True)
     date_state = models.DateField()
     date_from = models.DateField()
     date_to = models.DateField()
-    risk = models.ManyToManyField(Risk)
-    count_all = models.IntegerField()
-    count_contravention = models.IntegerField(blank=True, null=True)
-    point = models.TextField(blank=True, null=True)
+    message = models.CharField(max_length=255, blank=True, null=True)
     departments = models.ManyToManyField(Department)
     
     objects = models.Manager()
@@ -58,4 +54,15 @@ class CIC(models.Model):
         return "id:" + str(self.id)
     
     
+class Examination(models.Model):
+    obj = models.ForeignKey(Imns, on_delete=models.PROTECT)
+    risk = models.ForeignKey(Risk, on_delete=models.PROTECT)
+    cic  = models.ForeignKey(CIC, on_delete=models.PROTECT)
+    count_all = models.IntegerField()
+    count_contravention = models.IntegerField()
+    description = models.TextField(blank=True, null=True)    
     
+    objects = models.Manager()
+    
+    def __str__(self) -> str:
+        return "id:" + str(self.id)

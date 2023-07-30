@@ -12,7 +12,9 @@
             <br>
             <br>
         </form>
-        
+        {% if form.id.value != ''%}
+            <a href="{%url 'tvk:exam' cic=form.id.value %}" >Проверки</a>
+        {% endif %}
     </div>
     </div>
 {% endblock %}

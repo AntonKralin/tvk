@@ -1,0 +1,54 @@
+{% extends 'tvk/base_generic.html' %}
+
+{% block content %}
+    <div class='container-fluid'>
+    <div class='row'>
+        <p>
+            <strong>Субъект: </strong><label>{{cic.imnss.number}} {{cic.imnss.shot_name}}</label>
+        </p>
+        <p>
+            <strong>№ утвержденного отчета: </strong><label>{{cic.number}}</label>
+        </p>
+        <p>
+            <strong>Дата утвержденного отчета: </strong><label>{{cic.date_state}}</label>
+        </p>
+        <p>
+            <strong>Изучаемый период с-по: </strong><label>{{cic.date_from}}-{{cic.date_to}}</label>
+        </p>
+        <p>
+            <strong>Направлено обзорное письмо: </strong><label>{{cic.message}}</label>
+        </p>
+        <p>
+            <strong>Управление субъекта(кто проверяет): </strong>
+            <label>
+                {% for i_dep in cic.departments.all %}
+                    {{i_dep.name}};
+                {% endfor %}
+            </label>
+        </p>
+
+        <br>
+        <br>
+        <table class="table table-striped table-bordered w-auto">
+            <thead>
+                <th>Объект</th>
+                <th>Риск</th>
+                <th>Количество документов</th>
+                <th>Количество нарушений</th>
+                <th>Краткая суть нарушения</th>
+            </thead>
+            <tbody>
+                {%for i_exam in exam_list %}
+                    <tr>
+                        <td>{{i_exam.obj.number}}</td>
+                        <td>{{i_exam.risk.code}}</td>
+                        <td>{{i_exam.count_all}}</td>
+                        <td>{{i_exam.count_contravention}}</td>
+                        <td>{{i_exam.description}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+{% endblock %}

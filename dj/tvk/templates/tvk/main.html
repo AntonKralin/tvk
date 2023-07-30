@@ -8,13 +8,13 @@
                 <thead>
                         <th>№</th>
                         <th>Субъект</th>
-                        <th>Объект контроля</th>
+                        <th>Объекты контроля</th>
                         <th>№ отчета</th>
                         <th>Дата утверждения</th>
                         <th>Дата с-по</th>
-                        <th>Код риска</th>
+                        <th>Риски</th>
                         <th>Всего документов</th>
-                        <th>Нарушений</th>
+                        <th>Всего нарушений</th>
                         <th>Управление</th>
                         <th></th>
                         <th></th>
@@ -24,18 +24,28 @@
                         <tr>
                             <td>{{i_cic.id}}</td>
                             <td>{{i_cic.imnss.number}}</td>
-                            <td>{% for i_imns in i_cic.obj.all %}{{i_imns.number}} {%endfor%}</td>
+                            <td>
+                                {% for i_obj in i_cic.obj_list%}
+                                    {{i_obj.number}};
+                                {% endfor %}
+                            </td>
                             <td>{{i_cic.number}}</td>
                             <td>{{i_cic.date_state|date:'d.m.Y'}}</td>
                             <td>{{i_cic.date_from|date:'d.m.Y'}} - {{i_cic.date_to|date:'d.m.Y'}}</td>
-                            <td title="{% for i_risk in i_cic.risk.all%}{{i_risk.name}}; {%endfor%}">
-                                {%for i_risk in i_cic.risk.all%}{{i_risk.code}}; {%endfor%}
+                            <td>
+                                {% for i_risk in i_cic.risk_list %}
+                                    {{i_risk.code}}; 
+                                {% endfor %}
                             </td>
-                            <td>{{i_cic.count_all}}</td>
-                            <td>{{i_cic.count_contravention}}</td>
+                            <td>{{i_cic.sum_all}}</td>
+                            <td>{{i_cic.sum_cont}}</td>
                             <td>{% for i_dep in i_cic.departments.all %}{{i_dep.name}} {%endfor%}</td>
-                            <td><a href="{%url 'tvk:edit_cic' id=i_cic.id%}">✎</a></td>
-                            <td><a href="{%url 'tvk:edit_cic' id=i_cic.id%}">🔎</a></td>
+                            <td>
+                                {% if user.access < 5%}
+                                    <a href="{%url 'tvk:edit_cic' id=i_cic.id%}">✎</a>
+                                {% endif %}
+                            </td>
+                            <td><a href="{%url 'tvk:view_cic' id=i_cic.id%}">🔎</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

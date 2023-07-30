@@ -9,6 +9,7 @@ urlpatterns = [
     path('cic', views.cic, name='cic'),
     path('cic/<int:id>', views.cic, name='edit_cic'),
     path('save_cic', views.save_cic, name='save_cic'),
+    path('view_cic/<int:id>', views.view_cic, name='view_cic'),
     path('department', views.department, name='department'),
     path('department/<int:id>', views.department, name='edit_department'),
     path('save_department', views.save_department, name='save_department'),
@@ -24,4 +25,8 @@ urlpatterns = [
     path('delete_imns/<int:id>', views.delete_imns, name='delete_imns'),
     path('choose_period', views.choose_period, name='choose_period'),
     path('report', views.report, name='report'),
+    path('exam<int:cic>', views.exam, name='exam'),
+    path('exam<int:cic>/<int:id>', views.exam, name='edit_exam'),
+    path('save_exam', views.save_exam, name='save_exam'),
+    path('delete_exam/<int:id>', views.delete_exam, name='delete_exam'),
 ]
