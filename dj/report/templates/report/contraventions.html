@@ -1,0 +1,44 @@
+{%extends 'tvk/base_generic.html' %}
+
+{% block content %}
+    <div class='container-fluid'>
+    <div class='row'>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered w-auto">
+                <thead>
+                    <th>№</th>
+                    <th>Субъект</th>
+                    <th>Объект</th>
+                    <th>№ отчета</th>
+                    <th>Дата</th>
+                    <th>С-по</th>
+                    <th>Риск</th>
+                    <th>Документов</th>
+                    <th>Нарушений</th>
+                    <th>Краткая суть</th>
+                    <th>Управление</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    {% for i_rez in rez_list %}
+                        <tr>
+                            <td>{{i_rez.risk.id}}</td>
+                            <td>{{i_rez.risk.imnss.number}}</td>
+                            <td>{{i_rez.exam.obj.number}}</td>
+                            <td>{{i_rez.risk.number}}</td>
+                            <td>{{i_rez.risk.date_state}}</td>
+                            <td>{{i_rez.risk.date_from}}{{i_rez.date_to}}</td>
+                            <td>{{i_rez.exam.risk.code}}</td>
+                            <td>{{i_rez.exam.count_all}}</td>
+                            <td>{{i_rez.exam.count_contravention}}</td>
+                            <td>{{i_rez.exam.description}}</td>
+                            <td>{% for i_dep in i_rez.risk.departments.all %}{{i_dep.name}}; {%endfor%}</td>
+                            <td><a href="{%url 'tvk:view_cic' id=i_rez.risk.id%}">🔎</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+{% endblock %}

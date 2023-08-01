@@ -91,3 +91,25 @@ def report(request:HttpRequest):
         return render(request, 'report/report.html', context=context)
     
     return redirect('tvk:main')
+
+@login_required
+def contraventions(request: HttpRequest):
+    user = request.user
+    
+    cic = CIC.objects.all()
+    
+    rez = []
+    for i_cic in cic:
+        if user.access == 1 or user.access == 3 or user.access == 5:
+            exam = Examination.objects.filter(cic=i_cic).exclude(count_contravention=0)
+        else:
+            exam = Examination.objects.filter(cic=i_cic, obj=user.imns).exclude(count_contravention=0)
+
+        for i_exam in exam:
+            cic_buf = {'risk': i_cic}
+            cic_buf['exam'] = i_exam
+            rez.append(cic_buf)
+            
+    context = {'rez_list': rez}
+        
+    return render(request, 'report/contraventions.html', context=context)
