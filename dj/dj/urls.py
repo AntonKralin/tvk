@@ -23,5 +23,6 @@ urlpatterns = [
     path('', index),
     path('', include('tvk.urls', namespace='tvk')),
     path('user/', include('users.urls', namespace='user')),
+    path('report/', include('report.urls', namespace='report')),
     path('admin/', admin.site.urls),
 ]

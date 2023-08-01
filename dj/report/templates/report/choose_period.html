@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class='container'>
-        <form action="{% url 'tvk:report' %}" method='POST'>
+        <form action="{% url 'report:report' %}" method='POST'>
             {% csrf_token %}
             <table>
                 {{form.as_table}}

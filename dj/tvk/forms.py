@@ -126,11 +126,4 @@ class ExaminationForm(forms.ModelForm):
 
 class UploadRiskFileForm(forms.Form):
     file = forms.FileField(widget=forms.FileInput(attrs={'accept': ".csv"}))
-    
-    
-class ChoosePeriodForm(forms.Form):
-    date_from = forms.DateField(label='Период с', required=False, initial=None,
-                                widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    date_to = forms.DateField(label='Период по', required=False, initial=None,
-                              widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
-    
+     

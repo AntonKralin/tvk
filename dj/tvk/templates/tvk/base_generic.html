@@ -22,7 +22,12 @@
                 {% if user.access < 5 %}
                     <a class="navbar-brand" href="{%url 'tvk:cic' %}">Создать ТВК</a>
                 {% endif %}
-                <a class="navbar-brand" href="{% url 'tvk:choose_period' %}">Отчеты</a>
+                <li class="nav-item dropup">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown10" data-bs-toggle="dropdown" aria-expanded="false">Отчеты</a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown10">
+                        <li><a class="dropdown-item" href="{% url 'report:choose_period' %}">Сводный отчет</a></li>
+                    </ul>
+                </li>
             </ul>
 
             <form class="d-flex">
