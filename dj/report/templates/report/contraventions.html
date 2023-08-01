@@ -20,14 +20,14 @@
                     <th></th>
                 </thead>
                 <tbody>
-                    {% for i_rez in rez_list %}
+                    {% for i_rez in page_obj %}
                         <tr>
                             <td>{{i_rez.risk.id}}</td>
                             <td>{{i_rez.risk.imnss.number}}</td>
                             <td>{{i_rez.exam.obj.number}}</td>
                             <td>{{i_rez.risk.number}}</td>
-                            <td>{{i_rez.risk.date_state}}</td>
-                            <td>{{i_rez.risk.date_from}}{{i_rez.date_to}}</td>
+                            <td>{{i_rez.risk.date_state|date:'d.m.Y'}}</td>
+                            <td>{{i_rez.risk.date_from|date:'d.m.Y'}} - {{i_rez.risk.date_to|date:'d.m.Y'}}</td>
                             <td>{{i_rez.exam.risk.code}}</td>
                             <td>{{i_rez.exam.count_all}}</td>
                             <td>{{i_rez.exam.count_contravention}}</td>
@@ -39,6 +39,34 @@
                 </tbody>
             </table>
         </div>
+
+        {% block paginator %}
+            <div class='pagination'>
+                <span class='page-links'>
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'report:p_contraventions' page=page_obj.previous_page_number%}">Предыдущая</a>
+                        {% endif %}
+                        <span class="page-current">
+                            Страница {{page_obj.number}} из {{page_obj.paginator.num_pages}}.
+                        </span>
+                        {% if page_obj.has_next%}
+                        <a href="{% url 'report:p_contraventions' page=page_obj.next_page_number%}">Следующая</a>
+                    {% endif %}
+                    {% for page_number in page_obj.paginator.page_range %}
+                        <a
+                            href="{% url 'report:p_contraventions' page=page_number%}"
+                            class="{% if page_number == page_obj.number %}current{% endif %}"
+                        >
+                            {{page_number}}
+                        </a>
+                    {% endfor %}
+                </span>
+            </div>
+            <p></p>
+            <br>
+            <br>
+        {% endblock %}
+
     </div>
     </div>
 {% endblock %}

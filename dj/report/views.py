@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from .forms import ChoosePeriodForm
 from tvk.models import Department, Imns, CIC, Examination
 
@@ -93,7 +94,7 @@ def report(request:HttpRequest):
     return redirect('tvk:main')
 
 @login_required
-def contraventions(request: HttpRequest):
+def contraventions(request: HttpRequest, page:int=1):
     user = request.user
     
     cic = CIC.objects.all()
@@ -110,6 +111,9 @@ def contraventions(request: HttpRequest):
             cic_buf['exam'] = i_exam
             rez.append(cic_buf)
             
-    context = {'rez_list': rez}
+    paginator = Paginator(rez, 10)
+    page_obj = paginator.get_page(page)        
+    
+    context = {'page_obj': page_obj}
         
     return render(request, 'report/contraventions.html', context=context)
