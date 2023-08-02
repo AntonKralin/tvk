@@ -10,5 +10,11 @@ class ChoosePeriodForm(forms.Form):
     
     
 class FilterForm(forms.Form):
-    subject = forms.ModelChoiceField(label='Субъект', queryset=Imns.objects.order_by('number'))
-    obj = forms.ModelChoiceField(label='Субъект', queryset=Imns.objects.order_by('number').exclude(number=300))
+    subject = forms.ModelChoiceField(label='Субъект', queryset=Imns.objects.order_by('number'), 
+                                     widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)
+    obj = forms.ModelChoiceField(label='Объект', queryset=Imns.objects.order_by('number').exclude(number=300), 
+                                     widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)

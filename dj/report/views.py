@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from .forms import ChoosePeriodForm
+from .forms import ChoosePeriodForm, FilterForm
 from tvk.models import Department, Imns, CIC, Examination
 
 
@@ -97,12 +97,30 @@ def report(request:HttpRequest):
 def contraventions(request: HttpRequest, page:int=1):
     user = request.user
     
-    cic = CIC.objects.all()
+    form = FilterForm()
+    
+    if user.access != 1 or user.access != 3 or user.access != 5:
+        form.fields['obj'].queryset = Imns.objects.filter(id = user.imns.id)    
+    
+    subject = ''
+    obj = ''
+    if request.method == 'POST':
+        form = FilterForm(data=request.POST)
+        subject = form['subject'].value()
+        obj = form['obj'].value()
+    
+    if subject == '':
+        cic = CIC.objects.all()
+    else:
+        cic = CIC.objects.filter(imnss__pk=subject)
     
     rez = []
     for i_cic in cic:
         if user.access == 1 or user.access == 3 or user.access == 5:
-            exam = Examination.objects.filter(cic=i_cic).exclude(count_contravention=0)
+            if obj == '':
+                exam = Examination.objects.filter(cic=i_cic).exclude(count_contravention=0)
+            else:
+                exam = Examination.objects.filter(cic=i_cic, obj__pk=obj).exclude(count_contravention=0)
         else:
             exam = Examination.objects.filter(cic=i_cic, obj=user.imns).exclude(count_contravention=0)
 
@@ -114,6 +132,7 @@ def contraventions(request: HttpRequest, page:int=1):
     paginator = Paginator(rez, 10)
     page_obj = paginator.get_page(page)        
     
-    context = {'page_obj': page_obj}
+    context = {'page_obj': page_obj,
+               'form': form}
         
     return render(request, 'report/contraventions.html', context=context)

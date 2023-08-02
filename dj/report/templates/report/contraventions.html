@@ -3,8 +3,9 @@
 {% block content %}
     <div class='container-fluid'>
         <div class='row'>
-            <form action="" method='POST' name='contr_form'>
+            <form action="{% url 'report:contraventions'%}" method='POST' name='contr_form'>
                 {% csrf_token %}
+                {{form}}
             </form>
         </div>
         <div class="table-responsive">
