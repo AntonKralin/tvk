@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from .forms import ChoosePeriodForm, FilterForm
+from django.db.models import Sum
+from .forms import ChoosePeriodForm, FilterForm, CheckingFilterForm
 from tvk.models import Department, Imns, CIC, Examination
 
 
@@ -136,3 +137,42 @@ def contraventions(request: HttpRequest, page:int=1):
                'form': form}
         
     return render(request, 'report/contraventions.html', context=context)
+
+@login_required
+def checking(request:HttpRequest, page:int=1):
+    user = request.user
+    
+    form = CheckingFilterForm()  
+    
+    subject = ''
+    if request.method == 'POST':
+        form = CheckingFilterForm(data=request.POST)
+        subject = form['subject'].value()
+    
+    if subject == '':
+        cic = CIC.objects.all()
+    else:
+        cic = CIC.objects.filter(imnss__pk=subject)
+    
+    rez = []
+    for i_cic in cic:
+        if user.access == 1 or user.access == 3 or user.access == 5:
+            exam = Examination.objects.filter(cic=i_cic)
+        else:
+            exam = Examination.objects.filter(cic=i_cic, obj=user.imns)
+
+        sum_all = exam.aggregate(Sum('count_all'))
+        sum_cont = exam.aggregate(Sum('count_contravention'))
+        cic_buf = {'risk': i_cic}
+        cic_buf['risk_list'] = exam
+        cic_buf['sum_all'] = sum_all['count_all__sum'] if sum_all['count_all__sum'] else 0
+        cic_buf['sum_cont'] = sum_cont['count_contravention__sum'] if sum_cont['count_contravention__sum'] else 0 
+        rez.append(cic_buf)
+            
+    paginator = Paginator(rez, 10)
+    page_obj = paginator.get_page(page)        
+    
+    context = {'page_obj': page_obj,
+               'form': form}
+        
+    return render(request, 'report/checking.html', context=context)

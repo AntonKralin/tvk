@@ -1,0 +1,79 @@
+{%extends 'tvk/base_generic.html' %}
+
+{% block content %}
+    <div class='container-fluid'>
+        <div class='row'>
+            <form action="{% url 'report:checking'%}" method='POST'>
+                {% csrf_token %}
+                {{form}}
+            </form>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered w-auto">
+                <thead>
+                    <th>№</th>
+                    <th>Субъект</th>
+                    <th>Объект</th>
+                    <th>№ отчета</th>
+                    <th>Дата</th>
+                    <th>С-по</th>
+                    <th>Риск</th>
+                    <th>Всего документов</th>
+                    <th>Всего нарушений</th>
+                    <th>Управление</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    {% for i_rez in page_obj %}
+                        <tr>
+                            <td>{{i_rez.risk.id}}</td>
+                            <td>{{i_rez.risk.imnss.number}}</td>
+                            <td>
+                                {% for i_risk in i_rez.risk_list %}
+                                    {{i_risk.obj.number}}; 
+                                {% endfor %}
+                            </td>
+                            <td>{{i_rez.risk.number}}</td>
+                            <td>{{i_rez.risk.date_state|date:'d.m.Y'}}</td>
+                            <td>{{i_rez.risk.date_from|date:'d.m.Y'}} - {{i_rez.risk.date_to|date:'d.m.Y'}}</td>
+                            <td>
+                                {% for i_risk in i_rez.risk_list %}
+                                    {{i_risk.risk.code}}; 
+                                {% endfor %}
+                            </td>
+                            <td>{{i_rez.sum_all}}</td>
+                            <td>{{i_rez.sum_cont}}</td>
+                            <td>{% for i_dep in i_rez.risk.departments.all %}{{i_dep.name}}; {%endfor%}</td>
+                            <td><a href="{%url 'tvk:view_cic' id=i_rez.risk.id%}">🔎</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% block paginator %}
+            <div class='pagination'>
+                <span class='page-links'>
+                    {% if page_obj.has_previous %}
+                        <a href="{% url 'report:p_checking' page=page_obj.previous_page_number%}">Предыдущая</a>
+                        {% endif %}
+                        <span class="page-current">
+                            Страница {{page_obj.number}} из {{page_obj.paginator.num_pages}}.
+                        </span>
+                        {% if page_obj.has_next%}
+                        <a href="{% url 'report:p_checking' page=page_obj.next_page_number%}">Следующая</a>
+                    {% endif %}
+                    {% for page_number in page_obj.paginator.page_range %}
+                        <a
+                            href="{% url 'report:p_checking' page=page_number%}"
+                            class="{% if page_number == page_obj.number %}current{% endif %}"
+                        >
+                            {{page_number}}
+                        </a>
+                    {% endfor %}
+                </span>
+            </div>
+        {% endblock %}
+
+    </div>
+{% endblock %}

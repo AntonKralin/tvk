@@ -18,3 +18,10 @@ class FilterForm(forms.Form):
                                      widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)
+    
+
+class CheckingFilterForm(forms.Form):
+    subject = forms.ModelChoiceField(label='Субъект', queryset=Imns.objects.order_by('number'), 
+                                     widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)
