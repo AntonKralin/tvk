@@ -12,8 +12,11 @@
   <link href="{%static 'tvk/css/my.css'%}" rel="stylesheet">
 </head>
 
-<body>
-    {% block content %}{% endblock %}
+<body style='padding-bottom:55px'>
+    <div class="p-1"> 
+        {% block content %}{% endblock %}
+    </div>
+
     {%block footer %}
     <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark"> 
         <div class="container-fluid"> 
