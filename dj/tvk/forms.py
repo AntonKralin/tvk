@@ -21,7 +21,7 @@ class RiskForm(forms.ModelForm):
         'placeholder':'Код',
         'class':'form-control'
     }))
-    name = forms.CharField(label='Название', widget=forms.TextInput(attrs={
+    name = forms.CharField(label='Название', widget=forms.Textarea(attrs={
         'placeholder':'Название',
         'class':'form-control'
     }))

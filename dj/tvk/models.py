@@ -5,7 +5,7 @@ from django.urls import reverse
 # Create your models here.
 class Risk(models.Model):
     code = models.CharField(max_length=50, unique=True)
-    name = models.CharField(max_length=255)
+    name = models.TextField()
     description = models.TextField(blank=True, null=True)
     enable = models.BooleanField(default=True)
     
