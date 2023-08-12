@@ -37,7 +37,7 @@
                             <td>{{i_rez.exam.count_all}}</td>
                             <td>{{i_rez.exam.count_contravention}}</td>
                             <td>{{i_rez.exam.description}}</td>
-                            <td>{% for i_dep in i_rez.risk.departments.all %}{{i_dep.name}}; {%endfor%}</td>
+                            <td>{{i_rez.exam.department.name}}</td>
                             <td><a href="{%url 'tvk:view_cic' id=i_rez.risk.id%}">🔎</a></td>
                         </tr>
                     {% endfor %}

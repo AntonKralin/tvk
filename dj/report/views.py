@@ -39,20 +39,20 @@ def report(request:HttpRequest):
                 b_cic = b_cic.filter(date_state__lte=date_to)
             
             rez_dep = []
+            exam = Examination.objects.filter(obj=i_imns, cic__in=b_cic).exclude(count_contravention=0)
+            c1 = 0
+            c2 = 0
             for i_dep in departments:
-                dep_filt = b_cic.filter(departments=i_dep)
+                
+                dep_filt = exam.filter(department=i_dep)
                 if not dep_filt or dep_filt.count == 0:
                         rez_dep.append(0)
                         rez_dep.append(0)
                         continue
-                        
-                c1 = 0
-                c2 = 0
-                for i_cic in dep_filt:                    
-                    exam = Examination.objects.filter(obj=i_imns, cic=i_cic).exclude(count_contravention=0)
-                    c2 = exam.count()
-                    if c2 != 0:
-                        c1 += 1
+                
+                c1 = dep_filt.values('cic').distinct().count()        
+                c2 = dep_filt.count()
+                
                 rez_dep.append(c1)
                 rez_dep.append(c2)
             
@@ -181,6 +181,8 @@ def checking(request:HttpRequest, page:int=1):
         cic_buf['risk_list'] = Risk.objects.filter(id__in=risk_list)
         imns_list =exam.values('obj').distinct()
         cic_buf['imns_list'] = Imns.objects.filter(id__in=imns_list)
+        dep_list = exam.values('department').distinct()
+        cic_buf['dep_list'] = Department.objects.filter(id__in=dep_list)
         cic_buf['sum_all'] = sum_all['count_all__sum'] if sum_all['count_all__sum'] else 0
         cic_buf['sum_cont'] = sum_cont['count_contravention__sum'] if sum_cont['count_contravention__sum'] else 0 
         rez.append(cic_buf)

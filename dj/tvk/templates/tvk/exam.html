@@ -9,6 +9,7 @@
                     <thead>
                         <th>Объект</th>
                         <th>Риск</th>
+                        <th>Подразделение</th>
                         <th>Количество документов</th>
                         <th>Количество нарушений</th>
                         <th></th>
@@ -16,9 +17,10 @@
                     </thead>
                     <tbody>
                         {%for i_exam in exam_list %}
-                            <tr>
+                            <tr title='{{i_exam.description}}'>
                                 <td>{{i_exam.obj.number}}</td>
                                 <td>{{i_exam.risk.code}}</td>
+                                <td>{{i_exam.department.name}}</td>
                                 <td>{{i_exam.count_all}}</td>
                                 <td>{{i_exam.count_contravention}}</td>
                                 <td><a href="{% url 'tvk:edit_exam' cic=i_exam.cic.id id=i_exam.id %}">Изменить</a></td>

@@ -18,18 +18,12 @@
         <p>
             <strong>Направлено обзорное письмо: </strong><label>{{cic.message}}</label>
         </p>
-        <p>
-            <strong>Управление субъекта(кто проверяет): </strong>
-            <label>
-                {% for i_dep in cic.departments.all %}
-                    {{i_dep.name}};
-                {% endfor %}
-            </label>
 
         <table class="table table-striped table-bordered w-auto">
             <thead>
                 <th>Объект</th>
                 <th>Риск</th>
+                <th>Подразделение</th>
                 <th>Количество документов</th>
                 <th>Количество нарушений</th>
                 <th>Краткая суть нарушения</th>
@@ -39,6 +33,7 @@
                     <tr>
                         <td>{{i_exam.obj.number}}</td>
                         <td>{{i_exam.risk.code}}</td>
+                        <td>{{i_exam.department.name}}</td>
                         <td>{{i_exam.count_all}}</td>
                         <td>{{i_exam.count_contravention}}</td>
                         <td>{{i_exam.description}}</td>

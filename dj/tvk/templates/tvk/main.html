@@ -39,7 +39,7 @@
                             </td>
                             <td>{{i_cic.sum_all}}</td>
                             <td>{{i_cic.sum_cont}}</td>
-                            <td>{% for i_dep in i_cic.departments.all %}{{i_dep.name}} {%endfor%}</td>
+                            <td>{% for i_dep in i_cic.dep_list %}{{i_dep.name}}; {%endfor%}</td>
                             <td>
                                 {% if user.access < 5%}
                                     <a href="{%url 'tvk:edit_cic' id=i_cic.id%}">✎</a>

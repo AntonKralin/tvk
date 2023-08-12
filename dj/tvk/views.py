@@ -37,6 +37,12 @@ def main(request:HttpRequest, page:int=1):
             risk_list.append(Risk.objects.get(id=i_risk['risk']))
         i_cic.risk_list = risk_list
         
+        dep_list_buf = exam_list.values('department').distinct()
+        dep_list = []
+        for i_dep in dep_list_buf:
+            dep_list.append(Department.objects.get(id=i_dep['department']))
+        i_cic.dep_list = dep_list
+        
         i_cic.exam_list = exam_list
     
     paginator = Paginator(cic_list, 10)
@@ -236,6 +242,7 @@ def exam(request:HttpRequest, cic:int, id:int=None):
         form.fields['obj'].initial = exam.obj
         form.fields['cic'].initial = cic
         form.fields['risk'].initial = exam.risk
+        form.fields['department'].initial = exam.department
         form.fields['count_all'].initial = exam.count_all
         form.fields['count_contravention'].initial = exam.count_contravention
         form.fields['description'].initial = exam.description
@@ -256,6 +263,7 @@ def save_exam(request:HttpRequest):
         obj = request.POST.get('obj')
         risk = request.POST.get('risk')
         cic = request.POST.get('cic')
+        dep = request.POST.get('department')
         count_all = request.POST.get('count_all')
         count_contravention = request.POST.get('count_contravention')
         description = request.POST.get('description')
@@ -267,6 +275,7 @@ def save_exam(request:HttpRequest):
         exam.obj = Imns.objects.get(id=obj)
         exam.risk = Risk.objects.get(id=risk)
         exam.cic = CIC.objects.get(id=cic)
+        exam.department = Department.objects.get(id=dep)
         exam.count_all = count_all
         exam.count_contravention = count_contravention
         exam.description = description

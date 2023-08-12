@@ -18,7 +18,7 @@ class FilterForm(forms.Form):
                                      widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)
-    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code'), widget=forms.Select(attrs={
+    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code').exclude(enable=False), widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)
     
@@ -28,6 +28,6 @@ class CheckingFilterForm(forms.Form):
                                      widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)
-    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code'), widget=forms.Select(attrs={
+    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code').exclude(enable=False), widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)

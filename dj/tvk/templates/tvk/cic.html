@@ -12,12 +12,17 @@
             <br>
             <br>
         </form>
-        {% if form.id.value != ''%}
-            <a href="{%url 'tvk:exam' cic=form.id.value %}" >Проверки</a>
-        {% endif %}
-        {% if user.access == 1 and form.id.value != '' %}
-            <a href="{%url 'tvk:delete_cic' id=form.id.value %}" >Удалить</a>
-        {% endif %}
+
+        <div class='col-10'>
+            {% if form.id.value != ''%}
+                <a href="{%url 'tvk:exam' cic=form.id.value %}" >Проверки</a>
+            {% endif %}
+        </div>
+        <div class='col-2'>
+            {% if user.access == 1 and form.id.value != '' %}
+                <a href="{%url 'tvk:delete_cic' id=form.id.value %}" onclick="return confirm('Вы уверены что хотите удалить?');">Удалить</a>
+            {% endif %}
+        </div>
     </div>
     </div>
 {% endblock %}

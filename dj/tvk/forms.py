@@ -89,21 +89,18 @@ class CICForm(forms.ModelForm):
                                   "placeholder": 'Направлено обзорное письмо',
                                   'class': 'form-control'
                                   }), required=False, initial=None)
-    departments = forms.ModelMultipleChoiceField(label='Управление субъекта(кто проверяет)',
-                                         queryset=Department.objects.all(), widget=forms.SelectMultiple(attrs={
-                                             'class': 'form-control',
-                                             'size': 15
-                                         }))
+
     class Meta:
         model = CIC
         fields = ['id', 'imnss', 'number', 'date_state', 'date_from', 
-                  'date_to', 'message', 'departments']
+                  'date_to', 'message']
         
 class ExaminationForm(forms.ModelForm):
     id = forms.CharField(initial='', widget=forms.HiddenInput(), required=False)
     cic = forms.IntegerField(widget=forms.HiddenInput())
     obj = forms.ModelChoiceField(label='Объект', queryset=Imns.objects.order_by('number').exclude(number=300))
-    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code'))
+    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code').exclude(enable=False))
+    department = forms.ModelChoiceField(label='Подразделение', queryset=Department.objects.all())
     count_all = forms.IntegerField(label='Количество документов подвегрнутых контролю', 
                                    widget=forms.TextInput(attrs={
                                     "placeholder": 'Количество документов подвегрнутых контролю',
@@ -120,7 +117,7 @@ class ExaminationForm(forms.ModelForm):
     
     class Meta:
         model = Examination
-        fields = ['id', 'cic', 'obj', 'risk', 'count_all', 
+        fields = ['id', 'cic', 'obj', 'risk', 'department', 'count_all', 
                   'count_contravention', 'description']
         
 

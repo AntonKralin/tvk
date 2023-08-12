@@ -46,7 +46,6 @@ class CIC(models.Model):
     date_from = models.DateField()
     date_to = models.DateField()
     message = models.CharField(max_length=255, blank=True, null=True)
-    departments = models.ManyToManyField(Department)
     
     objects = models.Manager()
     
@@ -58,6 +57,7 @@ class Examination(models.Model):
     obj = models.ForeignKey(Imns, on_delete=models.PROTECT)
     risk = models.ForeignKey(Risk, on_delete=models.PROTECT)
     cic  = models.ForeignKey(CIC, on_delete=models.PROTECT)
+    department = models.ForeignKey(Department, on_delete=models.PROTECT)
     count_all = models.IntegerField()
     count_contravention = models.IntegerField()
     description = models.TextField(blank=True, null=True)    

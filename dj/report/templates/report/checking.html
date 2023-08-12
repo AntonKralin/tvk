@@ -43,7 +43,7 @@
                             </td>
                             <td>{{i_rez.sum_all}}</td>
                             <td>{{i_rez.sum_cont}}</td>
-                            <td>{% for i_dep in i_rez.risk.departments.all %}{{i_dep.name}}; {%endfor%}</td>
+                            <td>{% for i_dep in i_rez.dep_list %}{{i_dep.name}}; {%endfor%}</td>
                             <td><a href="{%url 'tvk:view_cic' id=i_rez.risk.id%}">🔎</a></td>
                         </tr>
                     {% endfor %}
