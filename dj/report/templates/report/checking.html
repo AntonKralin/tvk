@@ -29,8 +29,8 @@
                             <td>{{i_rez.risk.id}}</td>
                             <td>{{i_rez.risk.imnss.number}}</td>
                             <td>
-                                {% for i_risk in i_rez.risk_list %}
-                                    {{i_risk.obj.number}}; 
+                                {% for i_imns in i_rez.imns_list %}
+                                    {{i_imns.number}}; 
                                 {% endfor %}
                             </td>
                             <td>{{i_rez.risk.number}}</td>
@@ -38,7 +38,7 @@
                             <td>{{i_rez.risk.date_from|date:'d.m.Y'}} - {{i_rez.risk.date_to|date:'d.m.Y'}}</td>
                             <td>
                                 {% for i_risk in i_rez.risk_list %}
-                                    {{i_risk.risk.code}}; 
+                                    {{i_risk.code}}; 
                                 {% endfor %}
                             </td>
                             <td>{{i_rez.sum_all}}</td>

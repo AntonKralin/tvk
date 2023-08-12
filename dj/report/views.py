@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum
 from .forms import ChoosePeriodForm, FilterForm, CheckingFilterForm
-from tvk.models import Department, Imns, CIC, Examination
+from tvk.models import Department, Imns, CIC, Examination, Risk
 
 
 # Create your views here.
@@ -177,7 +177,10 @@ def checking(request:HttpRequest, page:int=1):
         sum_all = exam.aggregate(Sum('count_all'))
         sum_cont = exam.aggregate(Sum('count_contravention'))
         cic_buf = {'risk': i_cic}
-        cic_buf['risk_list'] = exam
+        risk_list = exam.values('risk').distinct()
+        cic_buf['risk_list'] = Risk.objects.filter(id__in=risk_list)
+        imns_list =exam.values('obj').distinct()
+        cic_buf['imns_list'] = Imns.objects.filter(id__in=imns_list)
         cic_buf['sum_all'] = sum_all['count_all__sum'] if sum_all['count_all__sum'] else 0
         cic_buf['sum_cont'] = sum_cont['count_contravention__sum'] if sum_cont['count_contravention__sum'] else 0 
         rez.append(cic_buf)
