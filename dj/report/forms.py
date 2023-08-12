@@ -1,5 +1,5 @@
 from django import forms
-from tvk.models import Imns
+from tvk.models import Imns, Risk
 
 
 class ChoosePeriodForm(forms.Form):
@@ -18,10 +18,16 @@ class FilterForm(forms.Form):
                                      widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)
+    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code'), widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)
     
 
 class CheckingFilterForm(forms.Form):
     subject = forms.ModelChoiceField(label='Субъект', queryset=Imns.objects.order_by('number'), 
                                      widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)
+    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code'), widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)

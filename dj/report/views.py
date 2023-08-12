@@ -105,10 +105,12 @@ def contraventions(request: HttpRequest, page:int=1):
     
     subject = ''
     obj = ''
+    risk = ''
     if request.method == 'POST':
         form = FilterForm(data=request.POST)
         subject = form['subject'].value()
         obj = form['obj'].value()
+        risk = form['risk'].value()
     
     if subject == '':
         cic = CIC.objects.all()
@@ -124,6 +126,9 @@ def contraventions(request: HttpRequest, page:int=1):
                 exam = Examination.objects.filter(cic=i_cic, obj__pk=obj).exclude(count_contravention=0)
         else:
             exam = Examination.objects.filter(cic=i_cic, obj=user.imns).exclude(count_contravention=0)
+
+        if risk != '':
+            exam = exam.filter(risk__pk=risk)
 
         for i_exam in exam:
             cic_buf = {'risk': i_cic}
@@ -145,9 +150,11 @@ def checking(request:HttpRequest, page:int=1):
     form = CheckingFilterForm()  
     
     subject = ''
+    risk = ''
     if request.method == 'POST':
         form = CheckingFilterForm(data=request.POST)
         subject = form['subject'].value()
+        risk = form['risk'].value()
     
     if subject == '':
         cic = CIC.objects.all()
@@ -160,6 +167,12 @@ def checking(request:HttpRequest, page:int=1):
             exam = Examination.objects.filter(cic=i_cic)
         else:
             exam = Examination.objects.filter(cic=i_cic, obj=user.imns)
+            
+        if risk != '':
+            exam = exam.filter(risk__pk=risk)
+
+        if exam.count() == 0:
+            continue
 
         sum_all = exam.aggregate(Sum('count_all'))
         sum_cont = exam.aggregate(Sum('count_contravention'))
