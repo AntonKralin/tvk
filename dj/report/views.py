@@ -56,13 +56,9 @@ def report(request:HttpRequest):
                 rez_dep.append(c1)
                 rez_dep.append(c2)
             
-            sum1 = 0
-            sum2 = 0
-            for i in range(len(rez_dep)):
-                if i == 0 or i % 2 == 0:
-                    sum1 += rez_dep[i]
-                else:
-                    sum2 += rez_dep[i]
+            #sum1 - cont all imns, sum2 -risk all imns
+            sum1 = exam.values('cic').distinct().count()
+            sum2 = exam.values('risk').distinct().count()
             
             buf_rez.append(sum1)
             buf_rez.append(sum2)      
@@ -74,7 +70,7 @@ def report(request:HttpRequest):
         #итого
         buf_rez_list = []
         len_list = (departments.count() * 2) + 5
-        for i_rez in range(3, len_list):
+        for i_rez in range(5, len_list):
             buf_count = 0
             for j_rez in rez:
                 buf_count += j_rez[i_rez]
@@ -84,6 +80,10 @@ def report(request:HttpRequest):
         buf_rez.append('')
         buf_rez.append('итого')
         buf_rez.append('')
+        total_cic = Examination.objects.filter(cic__in=b_cic).exclude(count_contravention=0).values('cic').distinct().count()
+        buf_rez.append(total_cic)
+        total_risk = Examination.objects.filter(cic__in=b_cic).exclude(count_contravention=0).values('risk').distinct().count()
+        buf_rez.append(total_risk)
         buf_rez.extend(buf_rez_list)
         rez.append(buf_rez)
         
@@ -100,7 +100,7 @@ def contraventions(request: HttpRequest, page:int=1):
     
     form = FilterForm()
     
-    if user.access != 1 or user.access != 3 or user.access != 5:
+    if user.access != 1 and user.access != 3 and user.access != 5:
         form.fields['obj'].queryset = Imns.objects.filter(id = user.imns.id)    
     
     subject = ''
