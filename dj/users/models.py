@@ -10,7 +10,7 @@ class User(AbstractUser):
     imns = models.ForeignKey(Imns, verbose_name='Инспекция', 
                              on_delete=models.PROTECT, 
                              blank=True, null=True)
-    
+
     def __str__(self):
-        return self.username
+        return str(self.username)
     
