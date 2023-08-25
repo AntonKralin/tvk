@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum
 from .models import Department, Risk, Imns, CIC, Examination
-from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm, UploadRiskFileForm, ExaminationForm
+from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm, UploadRiskFileForm,\
+    ExaminationForm, FilterMainForm
 from .function import handle_upload_file, update_risk
 
 
@@ -13,14 +14,46 @@ from .function import handle_upload_file, update_risk
 def main(request:HttpRequest, page:int=1):
     """main"""
     user = request.user
+    
+    mainform = FilterMainForm()
+    if user.access != 1 and user.access != 3 and user.access != 5:
+        mainform.fields['obj'].queryset = Imns.objects.filter(id = user.imns.id)
+        mainform.fields['subject'].queryset = Imns.objects.filter(id = user.imns.id)  
+    
+    
+    subject = ''
+    obj = ''
+    risk = ''
+    dep = ''
+    if 'subject' in request.GET:
+        mainform = FilterMainForm(data=request.GET)
+        subject = mainform['subject'].value()
+        obj = mainform['obj'].value()
+        risk = mainform['risk'].value()
+        dep = mainform['department'].value()
 
     if user.access == 1 or user.access == 3 or user.access == 5:
-        cic_list = CIC.objects.order_by('-id')
+        if subject != '':
+            cic_list = CIC.objects.filter(imnss__pk=subject).order_by('-id')
+        else:
+            cic_list = CIC.objects.order_by('-id')
     else:
         cic_list = CIC.objects.filter(imnss=user.imns.id).order_by('-id')
-
+    
+    
+    cic_rez = []
     for i_cic in cic_list:
         exam_list = Examination.objects.filter(cic=i_cic.id)
+        
+        if obj != '':
+            exam_list = exam_list.filter(obj__pk=obj)
+        if risk != '':
+            exam_list = exam_list.filter(risk__pk=risk)
+        if dep != '':
+            exam_list = exam_list.filter(department__pk=dep)
+        
+        if exam_list.count() == 0:
+            continue
 
         sum_all = exam_list.aggregate(Sum('count_all'))
         i_cic.sum_all = sum_all['count_all__sum'] if sum_all['count_all__sum'] else 0
@@ -45,11 +78,13 @@ def main(request:HttpRequest, page:int=1):
         i_cic.dep_list = dep_list
 
         i_cic.exam_list = exam_list
+        cic_rez.append(i_cic)
 
-    paginator = Paginator(cic_list, 20)
+    paginator = Paginator(cic_rez, 20)
     page_obj = paginator.get_page(page)
 
-    context = {'page_obj': page_obj}
+    context = {'page_obj': page_obj,
+               'form': mainform}
     return render(request, 'tvk/main.html', context=context)
 
 

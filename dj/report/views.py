@@ -67,7 +67,7 @@ def report_function(request: HttpRequest, subj_300=False, subj_raion=False):
                     continue
 
                 c1 = dep_filt.values('cic').distinct().count()        
-                c2 = dep_filt.count()
+                c2 = dep_filt.values('risk').distinct().count()
 
                 rez_dep.append(c1)
                 rez_dep.append(c2)
@@ -123,11 +123,13 @@ def contraventions(request: HttpRequest, page:int=1):
     subject = ''
     obj = ''
     risk = ''
-    if request.method == 'POST':
-        form = FilterForm(data=request.POST)
+    dep = ''
+    if "subject" in request.GET:
+        form = FilterForm(data=request.GET)
         subject = form['subject'].value()
         obj = form['obj'].value()
         risk = form['risk'].value()
+        dep = form['department'].value()
 
     if subject == '':
         cic = CIC.objects.all()
@@ -146,6 +148,9 @@ def contraventions(request: HttpRequest, page:int=1):
 
         if risk != '':
             exam = exam.filter(risk__pk=risk)
+        
+        if dep != '':
+            exam = exam.filter(department__pk=dep)
 
         for i_exam in exam:
             cic_buf = {'risk': i_cic}
@@ -169,15 +174,15 @@ def checking(request:HttpRequest, page:int=1):
 
     subject = ''
     risk = ''
-    if request.method == 'POST':
-        form = CheckingFilterForm(data=request.POST)
+    if 'subject' in request.GET:
+        form = CheckingFilterForm(data=request.GET)
         subject = form['subject'].value()
         risk = form['risk'].value()
 
     if subject == '':
-        cic = CIC.objects.all()
+        cic = CIC.objects.order_by('-pk')
     else:
-        cic = CIC.objects.filter(imnss__pk=subject)
+        cic = CIC.objects.filter(imnss__pk=subject).order_by('-pk')
 
     rez = []
     for i_cic in cic:
@@ -205,7 +210,7 @@ def checking(request:HttpRequest, page:int=1):
         cic_buf['sum_cont'] = sum_cont['count_contravention__sum'] if sum_cont['count_contravention__sum'] else 0
         rez.append(cic_buf)
 
-    paginator = Paginator(rez, 10)
+    paginator = Paginator(rez, 20)
     page_obj = paginator.get_page(page)
 
     context = {'page_obj': page_obj,
