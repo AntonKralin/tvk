@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum
+from django.conf import settings
 from .forms import ChoosePeriodForm, FilterForm, CheckingFilterForm
 from tvk.models import Department, Imns, CIC, Examination, Risk
+import csv
+import os
 
 
 # Create your views here.
@@ -24,9 +27,61 @@ def report(request:HttpRequest):
         return report_function(request, subj_raion=True)
     elif '300' in request.POST:
         return report_function(request, subj_300=True)
+    elif 'file' in request.POST:
+        return unload_csv(request)
     else:
         return report_function(request)
- 
+
+
+def unload_csv(request:HttpRequest):
+    user = request.user
+    
+    if user.access != 1 and user.access != 3 and user.access != 5:
+        b_cic = CIC.objects.filter(imnss=user.imns)
+    else:
+        b_cic = CIC.objects.all()
+    
+    date_from = request.POST.get('date_from', None)
+    date_to = request.POST.get('date_to', None)
+    
+    if date_from:
+        b_cic = b_cic.filter(date_state__gte=date_from)
+    if date_to:
+        b_cic = b_cic.filter(date_state__lte=date_to)
+        
+    header = ['Субъект', 'Объект', '№ отчета', 'Дата утверждения', 'Дата с', 'Дата по',
+              'Риск', 'Название риска', 'Документы', 'Нарушений', 'Краткая суть', 'Управление']
+    with open(user.username + '.csv', 'w') as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        
+        for i_cic in b_cic:
+            exam = Examination.objects.filter(cic=i_cic)
+            for i_exam in exam:
+                line = []
+                line.append(i_cic.imnss.number)
+                line.append(i_exam.obj.number)
+                line.append(i_cic.number)
+                line.append(i_cic.date_state)
+                line.append(i_cic.date_from)
+                line.append(i_cic.date_to)
+                line.append(i_exam.risk.code)
+                line.append(i_exam.risk.name)
+                line.append(i_exam.count_all)
+                line.append(i_exam.count_contravention)
+                line.append(i_exam.description)
+                line.append(i_exam.department.name)
+                writer.writerow(line)
+        
+    #unload file
+    file_path = os.path.join(settings.MEDIA_ROOT, user.username + '.csv')
+    if os.path.exists(file_path):
+                    with open(file_path, 'rb') as fh:
+                        response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+                        response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+                        return response
+    else:
+        return redirect('tvk:main')
  
 def report_function(request: HttpRequest, subj_300=False, subj_raion=False):
     if request.method == 'POST':
