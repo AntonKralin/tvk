@@ -51,8 +51,8 @@ def unload_csv(request:HttpRequest):
         
     header = ['Субъект', 'Объект', '№ отчета', 'Дата утверждения', 'Дата с', 'Дата по',
               'Риск', 'Название риска', 'Документы', 'Нарушений', 'Краткая суть', 'Управление']
-    with open(user.username + '.csv', 'w') as file:
-        writer = csv.writer(file)
+    with open(user.username + '.csv', mode='w', encoding='utf-8-sig') as file:
+        writer = csv.writer(file, delimiter=';')
         writer.writerow(header)
         
         for i_cic in b_cic:
@@ -76,7 +76,7 @@ def unload_csv(request:HttpRequest):
     #unload file
     file_path = os.path.join(settings.MEDIA_ROOT, user.username + '.csv')
     if os.path.exists(file_path):
-                    with open(file_path, 'rb') as fh:
+                    with open(file_path, mode='rb') as fh:
                         response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
                         response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
                         return response
