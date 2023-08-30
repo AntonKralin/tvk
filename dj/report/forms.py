@@ -34,3 +34,6 @@ class CheckingFilterForm(forms.Form):
     risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code').exclude(enable=False), widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)
+    department = forms.ModelChoiceField(label='Подразделение', queryset=Department.objects.all(), widget=forms.Select(attrs={
+                                            'onchange': "this.form.submit()"
+                                        }), required=False)

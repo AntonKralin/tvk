@@ -229,10 +229,12 @@ def checking(request:HttpRequest, page:int=1):
 
     subject = ''
     risk = ''
+    dep = ''
     if 'subject' in request.GET:
         form = CheckingFilterForm(data=request.GET)
         subject = form['subject'].value()
         risk = form['risk'].value()
+        dep = form['department'].value()
 
     if subject == '':
         cic = CIC.objects.order_by('-pk')
@@ -242,9 +244,15 @@ def checking(request:HttpRequest, page:int=1):
     rez = []
     for i_cic in cic:
         if user.access == 1 or user.access == 3 or user.access == 5:
-            exam = Examination.objects.filter(cic=i_cic)
+            if dep != '':
+                exam = Examination.objects.filter(cic=i_cic, department__pk=dep)
+            else:
+                exam = Examination.objects.filter(cic=i_cic)
         else:
-            exam = Examination.objects.filter(cic=i_cic, obj=user.imns)
+            if dep != '':
+                exam = Examination.objects.filter(cic=i_cic, obj=user.imns, department__pk=dep)
+            else:
+                exam = Examination.objects.filter(cic=i_cic, obj=user.imns)
 
         if risk != '':
             exam = exam.filter(risk__pk=risk)
