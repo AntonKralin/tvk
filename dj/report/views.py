@@ -9,21 +9,22 @@ from tvk.models import Department, Imns, CIC, Examination, Risk
 
 # Create your views here.
 @login_required
-def choose_period(request:HttpRequest):
+def choose_period(request: HttpRequest):
     choose_form = ChoosePeriodForm()
-    
+
     context = {'form': choose_form}
     return render(request, 'report/choose_period.html', context=context)
+
 
 @login_required
 def report(request:HttpRequest):
     if request.method == 'POST':
         date_from = request.POST.get('date_from', None)
         date_to = request.POST.get('date_to', None)
-        
+    
         departments = Department.objects.all()
         imns = Imns.objects.order_by('number').exclude(number=300)
-        
+
         rez = []
         count = 1
         for i_imns in imns:
@@ -31,31 +32,31 @@ def report(request:HttpRequest):
             buf_rez.append(str(count))
             buf_rez.append(str(i_imns.shot_name))
             buf_rez.append(str(i_imns.number))
-            
+
             b_cic =  CIC.objects.all()
             if date_from:
                 b_cic = b_cic.filter(date_state__gte=date_from)
             if date_to:
                 b_cic = b_cic.filter(date_state__lte=date_to)
-            
+
             rez_dep = []
             exam = Examination.objects.filter(obj=i_imns, cic__in=b_cic).exclude(count_contravention=0)
             c1 = 0
             c2 = 0
             for i_dep in departments:
-                
+    
                 dep_filt = exam.filter(department=i_dep)
                 if not dep_filt or dep_filt.count == 0:
                         rez_dep.append(0)
                         rez_dep.append(0)
                         continue
-                
+
                 c1 = dep_filt.values('cic').distinct().count()        
                 c2 = dep_filt.count()
-                
+
                 rez_dep.append(c1)
                 rez_dep.append(c2)
-            
+
             sum1 = 0
             sum2 = 0
             for i in range(len(rez_dep)):
@@ -63,15 +64,15 @@ def report(request:HttpRequest):
                     sum1 += rez_dep[i]
                 else:
                     sum2 += rez_dep[i]
-            
+
             buf_rez.append(sum1)
             buf_rez.append(sum2)      
             buf_rez.extend(rez_dep) 
-            
+
             rez.append(buf_rez)
             count += 1
-        
-        #итого
+
+        # итого
         buf_rez_list = []
         len_list = (departments.count() * 2) + 5
         for i_rez in range(3, len_list):
@@ -79,30 +80,31 @@ def report(request:HttpRequest):
             for j_rez in rez:
                 buf_count += j_rez[i_rez]
             buf_rez_list.append(buf_count)
-        
+
         buf_rez = []
         buf_rez.append('')
         buf_rez.append('итого')
         buf_rez.append('')
         buf_rez.extend(buf_rez_list)
         rez.append(buf_rez)
-        
+
         context = {'department_list': departments,
                    'rezult': rez}
 
         return render(request, 'report/report.html', context=context)
-    
+
     return redirect('tvk:main')
+
 
 @login_required
 def contraventions(request: HttpRequest, page:int=1):
     user = request.user
-    
+
     form = FilterForm()
-    
+
     if user.access != 1 or user.access != 3 or user.access != 5:
         form.fields['obj'].queryset = Imns.objects.filter(id = user.imns.id)    
-    
+
     subject = ''
     obj = ''
     risk = ''
@@ -111,12 +113,12 @@ def contraventions(request: HttpRequest, page:int=1):
         subject = form['subject'].value()
         obj = form['obj'].value()
         risk = form['risk'].value()
-    
+
     if subject == '':
         cic = CIC.objects.all()
     else:
         cic = CIC.objects.filter(imnss__pk=subject)
-    
+
     rez = []
     for i_cic in cic:
         if user.access == 1 or user.access == 3 or user.access == 5:
@@ -134,40 +136,41 @@ def contraventions(request: HttpRequest, page:int=1):
             cic_buf = {'risk': i_cic}
             cic_buf['exam'] = i_exam
             rez.append(cic_buf)
-            
+
     paginator = Paginator(rez, 10)
     page_obj = paginator.get_page(page)        
-    
+
     context = {'page_obj': page_obj,
                'form': form}
-        
+    
     return render(request, 'report/contraventions.html', context=context)
 
+
 @login_required
-def checking(request:HttpRequest, page:int=1):
+def checking(request: HttpRequest, page:int=1):
     user = request.user
-    
-    form = CheckingFilterForm()  
-    
+
+    form = CheckingFilterForm()
+
     subject = ''
     risk = ''
     if request.method == 'POST':
         form = CheckingFilterForm(data=request.POST)
         subject = form['subject'].value()
         risk = form['risk'].value()
-    
+
     if subject == '':
         cic = CIC.objects.all()
     else:
         cic = CIC.objects.filter(imnss__pk=subject)
-    
+
     rez = []
     for i_cic in cic:
         if user.access == 1 or user.access == 3 or user.access == 5:
             exam = Examination.objects.filter(cic=i_cic)
         else:
             exam = Examination.objects.filter(cic=i_cic, obj=user.imns)
-            
+
         if risk != '':
             exam = exam.filter(risk__pk=risk)
 
@@ -186,11 +189,11 @@ def checking(request:HttpRequest, page:int=1):
         cic_buf['sum_all'] = sum_all['count_all__sum'] if sum_all['count_all__sum'] else 0
         cic_buf['sum_cont'] = sum_cont['count_contravention__sum'] if sum_cont['count_contravention__sum'] else 0 
         rez.append(cic_buf)
-            
+
     paginator = Paginator(rez, 10)
-    page_obj = paginator.get_page(page)        
-    
+    page_obj = paginator.get_page(page)
+
     context = {'page_obj': page_obj,
                'form': form}
-        
+
     return render(request, 'report/checking.html', context=context)
