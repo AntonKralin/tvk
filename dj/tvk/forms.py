@@ -126,16 +126,10 @@ class FilterMainForm(forms.Form):
                                      widget=forms.Select(attrs={
                                         'onchange': "this.form.submit()"
                                     }), required=False)
-    obj = forms.ModelChoiceField(label='Объект', queryset=Imns.objects.order_by('number').exclude(number=300), 
-                                     widget=forms.Select(attrs={
-                                        'onchange': "this.form.submit()"
-                                    }), required=False)
-    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code').exclude(enable=False), widget=forms.Select(attrs={
-                                        'onchange': "this.form.submit()"
-                                    }), required=False)
-    department = forms.ModelChoiceField(label='Подразделение', queryset=Department.objects.all(), widget=forms.Select(attrs={
-                                            'onchange': "this.form.submit()"
-                                        }), required=False)
+    year = forms.ChoiceField(label='год', widget=forms.Select(attrs={
+                                'onchange': "this.form.submit()"
+                            }), required=False,
+                            choices=[(year, year) for year in range(datetime.datetime.now().year, 2021, -1 )])
         
 
 class UploadRiskFileForm(forms.Form):

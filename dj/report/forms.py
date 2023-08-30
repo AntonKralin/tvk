@@ -1,4 +1,5 @@
 from django import forms
+from datetime import datetime
 from tvk.models import Imns, Risk, Department
 
 
@@ -24,6 +25,10 @@ class FilterForm(forms.Form):
     department = forms.ModelChoiceField(label='Подразделение', queryset=Department.objects.all(), widget=forms.Select(attrs={
                                             'onchange': "this.form.submit()"
                                         }), required=False)
+    year = forms.ChoiceField(label='год', widget=forms.Select(attrs={
+                                'onchange': "this.form.submit()"
+                            }), required=False,
+                            choices=[('', '----')]+[(year, year) for year in range(datetime.now().year, 2021, -1 )])
     
 
 class CheckingFilterForm(forms.Form):
@@ -37,3 +42,7 @@ class CheckingFilterForm(forms.Form):
     department = forms.ModelChoiceField(label='Подразделение', queryset=Department.objects.all(), widget=forms.Select(attrs={
                                             'onchange': "this.form.submit()"
                                         }), required=False)
+    year = forms.ChoiceField(label='год', widget=forms.Select(attrs={
+                                'onchange': "this.form.submit()"
+                            }), required=False,
+                            choices=[('', '----')]+[(year, year) for year in range(datetime.now().year, 2021, -1 )])

@@ -179,17 +179,25 @@ def contraventions(request: HttpRequest, page:int=1):
     obj = ''
     risk = ''
     dep = ''
+    year = ''
     if "subject" in request.GET:
         form = FilterForm(data=request.GET)
         subject = form['subject'].value()
         obj = form['obj'].value()
         risk = form['risk'].value()
         dep = form['department'].value()
+        year = form['year'].value()
 
     if subject == '':
-        cic = CIC.objects.all()
+        if year != '':
+            cic = CIC.objects.filter(date_state__year=year)         
+        else:
+            cic = CIC.objects.all()
     else:
-        cic = CIC.objects.filter(imnss__pk=subject)
+        if year != '':
+            cic = CIC.objects.filter(imnss__pk=subject, date_state__year=year)
+        else:
+            cic = CIC.objects.filter(imnss__pk=subject)
 
     rez = []
     for i_cic in cic:
@@ -230,16 +238,24 @@ def checking(request:HttpRequest, page:int=1):
     subject = ''
     risk = ''
     dep = ''
+    year = ''
     if 'subject' in request.GET:
         form = CheckingFilterForm(data=request.GET)
         subject = form['subject'].value()
         risk = form['risk'].value()
         dep = form['department'].value()
+        year = form['year'].value()
 
     if subject == '':
-        cic = CIC.objects.order_by('-pk')
+        if year != '':
+            cic = CIC.objects.filter(date_state__year=year).order_by('-pk')
+        else:
+            cic = CIC.objects.order_by('-pk')
     else:
-        cic = CIC.objects.filter(imnss__pk=subject).order_by('-pk')
+        if year != '':
+            cic = CIC.objects.filter(imnss__pk=subject, date_state__year=year).order_by('-pk')
+        else:
+            cic = CIC.objects.filter(imnss__pk=subject).order_by('-pk')
 
     rez = []
     for i_cic in cic:
