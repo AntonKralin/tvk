@@ -3,7 +3,7 @@
 {% block content %}
     <div class='container-fluid'>
         <div class='row'>
-            <form action="{% url 'report:checking'%}" method='POST'>
+            <form action="{% url 'report:checking'%}" method='GET'>
                 {% csrf_token %}
                 {{form}}
             </form>
@@ -15,6 +15,7 @@
                     <th>Субъект</th>
                     <th>Объект</th>
                     <th>№ отчета</th>
+                    <th>Обзорное письмо</th>
                     <th>Дата</th>
                     <th>С-по</th>
                     <th>Риск</th>
@@ -34,6 +35,7 @@
                                 {% endfor %}
                             </td>
                             <td>{{i_rez.risk.number}}</td>
+                            <td>{{i_rez.risk.message}}</td>
                             <td>{{i_rez.risk.date_state|date:'d.m.Y'}}</td>
                             <td>{{i_rez.risk.date_from|date:'d.m.Y'}} - {{i_rez.risk.date_to|date:'d.m.Y'}}</td>
                             <td>

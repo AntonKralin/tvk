@@ -13,5 +13,3 @@ urlpatterns = [
     path('delete_user/<int:id>', views.delete_user, name='delete_user'),
     path('clearsession', views.clear_session, name='clearsession'),
 ]
-
-

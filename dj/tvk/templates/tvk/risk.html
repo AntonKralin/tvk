@@ -41,7 +41,6 @@
                 <p></p>
                 <p class="text-center">Для загрузки необходим файл *.csv в кодировке UTF-8, в котором будут 2 столбца(без заголовка/шапки): код риска и название</p>
                 <p class="text-center">Разделитель полей - ;</p>
-                <p class="text-center">Разделитель строк - "</p>
                 <form action="{% url 'tvk:upload_file'%}" enctype="multipart/form-data" method='POST'>
                     {% csrf_token %}
                     {{file_form.as_p}}

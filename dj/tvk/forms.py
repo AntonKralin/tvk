@@ -120,6 +120,23 @@ class ExaminationForm(forms.ModelForm):
         fields = ['id', 'cic', 'obj', 'risk', 'department', 'count_all', 
                   'count_contravention', 'description']
         
+        
+class FilterMainForm(forms.Form):
+    subject = forms.ModelChoiceField(label='Субъект', queryset=Imns.objects.order_by('number'), 
+                                     widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)
+    obj = forms.ModelChoiceField(label='Объект', queryset=Imns.objects.order_by('number').exclude(number=300), 
+                                     widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)
+    risk = forms.ModelChoiceField(label='Риск', queryset=Risk.objects.order_by('code').exclude(enable=False), widget=forms.Select(attrs={
+                                        'onchange': "this.form.submit()"
+                                    }), required=False)
+    department = forms.ModelChoiceField(label='Подразделение', queryset=Department.objects.all(), widget=forms.Select(attrs={
+                                            'onchange': "this.form.submit()"
+                                        }), required=False)
+        
 
 class UploadRiskFileForm(forms.Form):
     file = forms.FileField(widget=forms.FileInput(attrs={'accept': ".csv"}))
