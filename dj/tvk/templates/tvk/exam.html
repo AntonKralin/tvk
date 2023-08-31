@@ -12,6 +12,7 @@
                         <th>Подразделение</th>
                         <th>Количество документов</th>
                         <th>Количество нарушений</th>
+                        <th>ФИО</td>
                         <th></th>
                         <th></th>
                     </thead>
@@ -23,6 +24,7 @@
                                 <td>{{i_exam.department.name}}</td>
                                 <td>{{i_exam.count_all}}</td>
                                 <td>{{i_exam.count_contravention}}</td>
+                                <td>{{i_exam.fio}}</td>
                                 <td><a href="{% url 'tvk:edit_exam' cic=i_exam.cic.id id=i_exam.id %}">Изменить</a></td>
                                 <td><a href="{% url 'tvk:delete_exam' id=i_exam.id %}">Удалить</a></td>
                             </tr>

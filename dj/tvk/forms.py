@@ -114,13 +114,17 @@ class ExaminationForm(forms.ModelForm):
                                 'placeholder':'Краткое содержание нарушения',
                                 'class':'form-control'
                                 }), required=False)
-    
+    fio = forms.CharField(label='ФИО нарушителя', widget=forms.TextInput({
+                            'placeholder': 'ФИО нарушителя',
+                            'class': 'form-control'
+                        }), required=False)
+
     class Meta:
         model = Examination
         fields = ['id', 'cic', 'obj', 'risk', 'department', 'count_all', 
-                  'count_contravention', 'description']
-        
-        
+                  'count_contravention', 'description', 'fio']
+
+
 class FilterMainForm(forms.Form):
     subject = forms.ModelChoiceField(label='Субъект', queryset=Imns.objects.order_by('number'), 
                                      widget=forms.Select(attrs={
@@ -130,8 +134,7 @@ class FilterMainForm(forms.Form):
                                 'onchange': "this.form.submit()"
                             }), required=False,
                             choices=[(year, year) for year in range(datetime.datetime.now().year, 2021, -1 )])
-        
+
 
 class UploadRiskFileForm(forms.Form):
     file = forms.FileField(widget=forms.FileInput(attrs={'accept': ".csv"}))
-     

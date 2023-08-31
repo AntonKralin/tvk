@@ -50,7 +50,7 @@ def unload_csv(request:HttpRequest):
         b_cic = b_cic.filter(date_state__lte=date_to)
         
     header = ['Субъект', 'Объект', '№ отчета', 'Дата утверждения', 'Дата с', 'Дата по',
-              'Риск', 'Название риска', 'Документы', 'Нарушений', 'Краткая суть', 'Управление']
+              'Риск', 'Название риска', 'Документы', 'Нарушений', 'Краткая суть', 'Управление', 'ФИО']
     with open(user.username + '.csv', mode='w', encoding='utf-8-sig') as file:
         writer = csv.writer(file, delimiter=';')
         writer.writerow(header)
@@ -71,6 +71,7 @@ def unload_csv(request:HttpRequest):
                 line.append(i_exam.count_contravention)
                 line.append(i_exam.description)
                 line.append(i_exam.department.name)
+                line.append(i_exam.fio)
                 writer.writerow(line)
         
     #unload file
@@ -190,24 +191,24 @@ def contraventions(request: HttpRequest, page:int=1):
 
     if subject == '':
         if year != '':
-            cic = CIC.objects.filter(date_state__year=year)         
+            cic = CIC.objects.filter(date_state__year=year).order_by('-id')
         else:
-            cic = CIC.objects.all()
+            cic = CIC.objects.order_by('-id')
     else:
         if year != '':
-            cic = CIC.objects.filter(imnss__pk=subject, date_state__year=year)
+            cic = CIC.objects.filter(imnss__pk=subject, date_state__year=year).order_by('-id')
         else:
-            cic = CIC.objects.filter(imnss__pk=subject)
+            cic = CIC.objects.filter(imnss__pk=subject).order_by('-id')
 
     rez = []
     for i_cic in cic:
         if user.access == 1 or user.access == 3 or user.access == 5:
             if obj == '':
-                exam = Examination.objects.filter(cic=i_cic).exclude(count_contravention=0)
+                exam = Examination.objects.filter(cic=i_cic).exclude(count_contravention=0).order_by('-id')
             else:
-                exam = Examination.objects.filter(cic=i_cic, obj__pk=obj).exclude(count_contravention=0)
+                exam = Examination.objects.filter(cic=i_cic, obj__pk=obj).exclude(count_contravention=0).order_by('-id')
         else:
-            exam = Examination.objects.filter(cic=i_cic, obj=user.imns).exclude(count_contravention=0)
+            exam = Examination.objects.filter(cic=i_cic, obj=user.imns).exclude(count_contravention=0).order_by('-id')
 
         if risk != '':
             exam = exam.filter(risk__pk=risk)

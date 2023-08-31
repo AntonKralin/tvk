@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 
 
 # Create your models here.
@@ -8,21 +7,21 @@ class Risk(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
     enable = models.BooleanField(default=True)
-    
+
     objects = models.Manager()
-    
+
     def __str__(self) -> str:
         return self.code
-    
+
 
 class Department(models.Model):
     name = models.CharField(max_length=255)
     objects = models.Manager()
-    
+
     def __str__(self):
-        return str(self.name)    
-    
-    
+        return str(self.name)
+
+
 class Imns(models.Model):
     number = models.IntegerField()
     name = models.CharField(max_length=255)
@@ -31,14 +30,13 @@ class Imns(models.Model):
     email = models.CharField(max_length=255, blank=True, null=True)
     post = models.CharField(max_length=255, blank=True, null=True)
     unp = models.CharField(max_length=255, blank=True, null=True)
-    
+
     objects = models.Manager()
-    
+
     def __str__(self) -> str:
         return str(self.number) + " " + self.shot_name
 
-    
-    
+
 class CIC(models.Model):
     imnss = models.ForeignKey(Imns, on_delete=models.PROTECT)
     number = models.CharField(max_length=255, blank=True, null=True)
@@ -46,13 +44,13 @@ class CIC(models.Model):
     date_from = models.DateField()
     date_to = models.DateField()
     message = models.CharField(max_length=255, blank=True, null=True)
-    
+
     objects = models.Manager()
-    
+
     def __str__(self) -> str:
         return "id:" + str(self.id)
-    
-    
+
+
 class Examination(models.Model):
     obj = models.ForeignKey(Imns, on_delete=models.PROTECT)
     risk = models.ForeignKey(Risk, on_delete=models.PROTECT)
@@ -60,9 +58,10 @@ class Examination(models.Model):
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
     count_all = models.IntegerField()
     count_contravention = models.IntegerField()
-    description = models.TextField(blank=True, null=True)    
-    
+    description = models.TextField(blank=True, null=True)
+    fio = models.CharField(max_length=100, blank=True, null=True)
+
     objects = models.Manager()
-    
+
     def __str__(self) -> str:
         return "id:" + str(self.id)

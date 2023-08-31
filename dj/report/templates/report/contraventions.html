@@ -23,6 +23,7 @@
                     <th>Нарушений</th>
                     <th>Краткая суть</th>
                     <th>Управление</th>
+                    <th>ФИО</th>
                     <th></th>
                 </thead>
                 <tbody>
@@ -40,6 +41,7 @@
                             <td>{{i_rez.exam.count_contravention}}</td>
                             <td>{{i_rez.exam.description}}</td>
                             <td>{{i_rez.exam.department.name}}</td>
+                            <td>{{i_rez.exam.fio}}</td>
                             <td><a href="{%url 'tvk:view_cic' id=i_rez.risk.id%}">🔎</a></td>
                         </tr>
                     {% endfor %}

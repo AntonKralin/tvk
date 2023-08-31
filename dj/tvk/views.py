@@ -321,6 +321,7 @@ def save_exam(request:HttpRequest):
         count_all = request.POST.get('count_all')
         count_contravention = request.POST.get('count_contravention')
         description = request.POST.get('description')
+        fio = request.POST.get('fio')
 
         exam = Examination()
         if id != '':
@@ -333,6 +334,7 @@ def save_exam(request:HttpRequest):
         exam.count_all = count_all
         exam.count_contravention = count_contravention
         exam.description = description
+        exam.fio = fio
         exam.save()
 
         return redirect('tvk:exam', cic=cic)
