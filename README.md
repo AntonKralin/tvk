@@ -15,3 +15,9 @@ To run this app:
 + ./manage.py loaddata fixture/imns.json (if you run at first)
 + ./manage.py loaddata fixture/user.json (if you run at first)
 + ./manage.py runsever {ip:port} (start app)
+
+
+To run in Docker-compose
+docker-compose up
+
+8100 - app, 8003 - phpmyadmin
