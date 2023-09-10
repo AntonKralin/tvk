@@ -1,7 +1,7 @@
 # tvk
 curent internal control
 
-This app tested python 3.10
+This app tested on ubuntu 20.04, python 3.10, sqllite3
 
 To run this app:
 + install python3, pip3, python3-venv
