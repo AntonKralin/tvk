@@ -54,7 +54,7 @@ class CIC(models.Model):
 class Examination(models.Model):
     obj = models.ForeignKey(Imns, on_delete=models.PROTECT)
     risk = models.ForeignKey(Risk, on_delete=models.PROTECT)
-    cic  = models.ForeignKey(CIC, on_delete=models.PROTECT)
+    cic = models.ForeignKey(CIC, on_delete=models.PROTECT)
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
     count_all = models.IntegerField()
     count_contravention = models.IntegerField()

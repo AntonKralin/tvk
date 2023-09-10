@@ -9,7 +9,7 @@ from .const import access_r
 
 
 # Create your views here.
-def index(request:HttpRequest):
+def index(request: HttpRequest):
     """index page"""
     if request.method == 'GET':
         id_user = request.session.get('id_user', None)
@@ -18,7 +18,8 @@ def index(request:HttpRequest):
     context = {"form": UserLoginForm()}
     return render(request, 'users/index.html', context=context)
 
-def login(request:HttpRequest):
+
+def login(request: HttpRequest):
     """login page"""
     if request.method == "POST":
 
@@ -40,8 +41,8 @@ def login(request:HttpRequest):
         return render(request, 'users/index.html', context=context)
 
 
-@login_required    
-def users(request:HttpRequest, id:int=None):
+@login_required
+def users(request: HttpRequest, id: int = None):
     """users page"""
     user = request.user
 
@@ -67,7 +68,7 @@ def users(request:HttpRequest, id:int=None):
 
 
 @login_required
-def save_user(request:HttpRequest):
+def save_user(request: HttpRequest):
     """save_user page"""
     if request.method == "POST":
         id = request.POST.get('id', '')
@@ -92,13 +93,14 @@ def save_user(request:HttpRequest):
         if user_form.is_valid():
             user_form.save()
         else:
-            return HttpResponse('Не верно заполнена форма' + str(user_form.errors))
+            return HttpResponse('Не верно заполнена форма'
+                                + str(user_form.errors))
 
     return redirect('users:users')
 
 
 @login_required
-def delete_user(request:HttpRequest, id:int=None):
+def delete_user(request: HttpRequest, id: int = None):
     """delete_user page"""
     if request.method == "GET" and id:
         del_user = User.objects.get(id=id)
@@ -106,7 +108,7 @@ def delete_user(request:HttpRequest, id:int=None):
     return redirect('users:users')
 
 
-def clear_session(request:HttpRequest):
+def clear_session(request: HttpRequest):
     """clear session"""
     request.session.clear()
     request.session.modified = True

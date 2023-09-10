@@ -5,23 +5,22 @@ from django.core.paginator import Paginator
 from django.db.models import Sum
 from datetime import datetime
 from .models import Department, Risk, Imns, CIC, Examination
-from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm, UploadRiskFileForm,\
-    ExaminationForm, FilterMainForm
+from .forms import DepartmentsForm, RiskForm, IMNSForm, CICForm,\
+    UploadRiskFileForm, ExaminationForm, FilterMainForm
 from .function import handle_upload_file, update_risk
 
 
 # Create your views here.
 @login_required
-def main(request:HttpRequest, page:int=1):
+def main(request: HttpRequest, page: int = 1):
     """main"""
     user = request.user
-    
+
     mainform = FilterMainForm()
     if user.access != 1 and user.access != 3 and user.access != 5:
-        mainform.fields['obj'].queryset = Imns.objects.filter(id = user.imns.id)
-        mainform.fields['subject'].queryset = Imns.objects.filter(id = user.imns.id)  
-    
-    
+        mainform.fields['obj'].queryset = Imns.objects.filter(id=user.imns.id)
+        mainform.fields['subject'].queryset = Imns.objects.filter(id=user.imns.id)
+
     subject = ''
     year = datetime.now().year
     if 'subject' in request.GET:
@@ -36,7 +35,7 @@ def main(request:HttpRequest, page:int=1):
             cic_list = CIC.objects.filter(date_state__year=year).order_by('-id')
     else:
         cic_list = CIC.objects.filter(imnss=user.imns.id, date_state__year=year).order_by('-id')
-    
+
     cic_rez = []
     for i_cic in cic_list:
         exam_list = Examination.objects.filter(cic=i_cic.id)
@@ -50,7 +49,7 @@ def main(request:HttpRequest, page:int=1):
         obj_list = []
         for i_obj in obj_list_buf:
             obj_list.append(Imns.objects.get(id=i_obj['obj']))
-        i_cic.obj_list= obj_list
+        i_cic.obj_list = obj_list
         risk_list_buf = exam_list.values('risk').distinct()
         risk_list = []
         for i_risk in risk_list_buf:
@@ -75,7 +74,7 @@ def main(request:HttpRequest, page:int=1):
 
 
 @login_required
-def cic(request:HttpRequest, id:int=None):
+def cic(request: HttpRequest, id: int = None):
     """cic"""
     user = request.user
 
@@ -94,7 +93,7 @@ def cic(request:HttpRequest, id:int=None):
 
 
 @login_required
-def save_cic(request:HttpRequest):
+def save_cic(request: HttpRequest):
     """save_cic"""
     if request.method == "POST":
         id = request.POST.get('id', '')
@@ -111,7 +110,7 @@ def save_cic(request:HttpRequest):
 
 
 @login_required
-def view_cic(request:HttpRequest, id:int):
+def view_cic(request: HttpRequest, id: int):
     """view_cic"""
     if id:
 
@@ -126,7 +125,7 @@ def view_cic(request:HttpRequest, id:int):
 
 
 @login_required
-def delete_cic(request:HttpRequest, id:int):
+def delete_cic(request: HttpRequest, id: int):
     """delete_cic"""
     if id:
         cic = CIC.objects.get(id=id)
@@ -138,7 +137,7 @@ def delete_cic(request:HttpRequest, id:int):
 
 
 @login_required
-def department(request:HttpRequest, id:int=None):
+def department(request: HttpRequest, id: int = None):
     """department"""
     dep_form = DepartmentsForm()
     department_list = Department.objects.all()
@@ -153,7 +152,7 @@ def department(request:HttpRequest, id:int=None):
 
 
 @login_required
-def save_department(request:HttpRequest):
+def save_department(request: HttpRequest):
     """save_department"""
     if request.method == 'POST':
         dep_form = DepartmentsForm(data=request.POST)
@@ -168,7 +167,7 @@ def save_department(request:HttpRequest):
 
 
 @login_required
-def delete_department(request:HttpRequest, id:int=None):
+def delete_department(request: HttpRequest, id: int = None):
     """delete_deparment"""
     if id:
         department = Department.objects.get(id=id)
@@ -177,7 +176,7 @@ def delete_department(request:HttpRequest, id:int=None):
 
 
 @login_required
-def risk(request:HttpRequest, id:int=None):
+def risk(request: HttpRequest, id: int = None):
     """risk"""
     risk_form = RiskForm()
     file_form = UploadRiskFileForm()
@@ -196,7 +195,7 @@ def risk(request:HttpRequest, id:int=None):
 
 
 @login_required
-def save_risk(request:HttpRequest):
+def save_risk(request: HttpRequest):
     """save_risk"""
     if request.method == 'POST':
         id = request.POST.get('id', '')
@@ -214,7 +213,7 @@ def save_risk(request:HttpRequest):
 
 
 @login_required
-def delete_risk(request:HttpRequest, id:int=None):
+def delete_risk(request: HttpRequest, id: int = None):
     """delete risk"""
     if id:
         risk = Risk.objects.get(id=id)
@@ -223,7 +222,7 @@ def delete_risk(request:HttpRequest, id:int=None):
 
 
 @login_required
-def upload_file(request:HttpRequest):
+def upload_file(request: HttpRequest):
     """upload file"""
     if request.method == 'POST':
         file_form = UploadRiskFileForm(request.POST, request.FILES)
@@ -237,7 +236,7 @@ def upload_file(request:HttpRequest):
 
 
 @login_required
-def imns(request:HttpRequest, id:int=None):
+def imns(request: HttpRequest, id: int = None):
     """imns"""
     imns_form = IMNSForm()
 
@@ -253,7 +252,7 @@ def imns(request:HttpRequest, id:int=None):
 
 
 @login_required
-def save_imns(request:HttpRequest):
+def save_imns(request: HttpRequest):
     """save_imns"""
     if request.method == 'POST':
         imns_form = IMNSForm()
@@ -271,7 +270,7 @@ def save_imns(request:HttpRequest):
 
 
 @login_required
-def delete_imns(request:HttpRequest, id:int=None):
+def delete_imns(request: HttpRequest, id: int = None):
     """delete_imns"""
     if id:
         imns = Imns.objects.get(id=id)
@@ -280,7 +279,7 @@ def delete_imns(request:HttpRequest, id:int=None):
 
 
 @login_required
-def exam(request:HttpRequest, cic:int, id:int=None):
+def exam(request: HttpRequest, cic: int, id: int = None):
     """exam"""
     form = ExaminationForm()
 
@@ -310,7 +309,7 @@ def exam(request:HttpRequest, cic:int, id:int=None):
 
 
 @login_required
-def save_exam(request:HttpRequest):
+def save_exam(request: HttpRequest):
     """save_exam"""
     if request.method == 'POST':
         id = request.POST.get('id', '')
@@ -343,7 +342,7 @@ def save_exam(request:HttpRequest):
 
 
 @login_required
-def delete_exam(request:HttpRequest, id:int=None):
+def delete_exam(request: HttpRequest, id: int = None):
     """delet_exam"""
     if id:
         exam = Examination.objects.get(id=id)

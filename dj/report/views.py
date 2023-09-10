@@ -12,7 +12,7 @@ import os
 
 # Create your views here.
 @login_required
-def choose_period(request:HttpRequest):
+def choose_period(request: HttpRequest):
     """chose period"""
     choose_form = ChoosePeriodForm()
 
@@ -21,7 +21,7 @@ def choose_period(request:HttpRequest):
 
 
 @login_required
-def report(request:HttpRequest):
+def report(request: HttpRequest):
     """report"""
     if 'raion' in request.POST:
         return report_function(request, subj_raion=True)
@@ -33,28 +33,29 @@ def report(request:HttpRequest):
         return report_function(request)
 
 
-def unload_csv(request:HttpRequest):
+def unload_csv(request: HttpRequest):
     user = request.user
-    
+
     if user.access != 1 and user.access != 3 and user.access != 5:
         b_cic = CIC.objects.filter(imnss=user.imns)
     else:
         b_cic = CIC.objects.all()
-    
+
     date_from = request.POST.get('date_from', None)
     date_to = request.POST.get('date_to', None)
-    
+
     if date_from:
         b_cic = b_cic.filter(date_state__gte=date_from)
     if date_to:
         b_cic = b_cic.filter(date_state__lte=date_to)
-        
-    header = ['Субъект', 'Объект', '№ отчета', 'Дата утверждения', 'Дата с', 'Дата по',
-              'Риск', 'Название риска', 'Документы', 'Нарушений', 'Краткая суть', 'Управление', 'ФИО']
+
+    header = ['Субъект', 'Объект', '№ отчета', 'Дата утверждения', 'Дата с',
+              'Дата по', 'Риск', 'Название риска', 'Документы', 'Нарушений',
+              'Краткая суть', 'Управление', 'ФИО']
     with open(user.username + '.csv', mode='w', encoding='utf-8-sig') as file:
         writer = csv.writer(file, delimiter=';')
         writer.writerow(header)
-        
+
         for i_cic in b_cic:
             exam = Examination.objects.filter(cic=i_cic)
             for i_exam in exam:
@@ -73,17 +74,20 @@ def unload_csv(request:HttpRequest):
                 line.append(i_exam.department.name)
                 line.append(i_exam.fio)
                 writer.writerow(line)
-        
-    #unload file
+
+    """unload file"""
     file_path = os.path.join(settings.MEDIA_ROOT, user.username + '.csv')
     if os.path.exists(file_path):
-                    with open(file_path, mode='rb') as fh:
-                        response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
-                        response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
-                        return response
+        with open(file_path, mode='rb') as fh:
+            response = HttpResponse(fh.read(),
+                                    content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + \
+                os.path.basename(file_path)
+            return response
     else:
         return redirect('tvk:main')
- 
+
+
 def report_function(request: HttpRequest, subj_300=False, subj_raion=False):
     if request.method == 'POST':
         date_from = request.POST.get('date_from', None)
@@ -99,7 +103,7 @@ def report_function(request: HttpRequest, subj_300=False, subj_raion=False):
             buf_rez.append(str(i_imns.shot_name))
             buf_rez.append(str(i_imns.number))
 
-            b_cic =  CIC.objects.all()
+            b_cic = CIC.objects.all()
             if date_from:
                 b_cic = b_cic.filter(date_state__gte=date_from)
             if date_to:
@@ -121,24 +125,24 @@ def report_function(request: HttpRequest, subj_300=False, subj_raion=False):
                     rez_dep.append(0)
                     continue
 
-                c1 = dep_filt.values('cic').distinct().count()        
+                c1 = dep_filt.values('cic').distinct().count()
                 c2 = dep_filt.values('risk').distinct().count()
 
                 rez_dep.append(c1)
                 rez_dep.append(c2)
 
-            #sum1 - cont all imns, sum2 -risk all imns
+            # sum1 - cont all imns, sum2 -risk all imns
             sum1 = exam.values('cic').distinct().count()
             sum2 = exam.values('risk').distinct().count()
 
             buf_rez.append(sum1)
-            buf_rez.append(sum2)      
-            buf_rez.extend(rez_dep) 
+            buf_rez.append(sum2)
+            buf_rez.extend(rez_dep)
 
             rez.append(buf_rez)
             count += 1
 
-        #итого
+        # итого
         buf_rez_list = []
         for i_dep in departments:
             total_cic_dep = Examination.objects.filter(cic__in=b_cic, department=i_dep).exclude(count_contravention=0).values('cic').distinct().count()
@@ -163,18 +167,17 @@ def report_function(request: HttpRequest, subj_300=False, subj_raion=False):
         return render(request, 'report/report.html', context=context)
 
     return redirect('tvk:main')
-    
 
 
 @login_required
-def contraventions(request: HttpRequest, page:int=1):
+def contraventions(request: HttpRequest, page: int = 1):
     """contravention"""
     user = request.user
 
     form = FilterForm()
 
     if user.access != 1 and user.access != 3 and user.access != 5:
-        form.fields['obj'].queryset = Imns.objects.filter(id = user.imns.id)    
+        form.fields['obj'].queryset = Imns.objects.filter(id=user.imns.id)
 
     subject = ''
     obj = ''
@@ -212,7 +215,7 @@ def contraventions(request: HttpRequest, page:int=1):
 
         if risk != '':
             exam = exam.filter(risk__pk=risk)
-        
+
         if dep != '':
             exam = exam.filter(department__pk=dep)
 
@@ -222,7 +225,7 @@ def contraventions(request: HttpRequest, page:int=1):
             rez.append(cic_buf)
 
     paginator = Paginator(rez, 10)
-    page_obj = paginator.get_page(page)        
+    page_obj = paginator.get_page(page)
 
     context = {'page_obj': page_obj,
                'form': form}
@@ -230,7 +233,7 @@ def contraventions(request: HttpRequest, page:int=1):
 
 
 @login_required
-def checking(request:HttpRequest, page:int=1):
+def checking(request: HttpRequest, page: int = 1):
     """checking"""
     user = request.user
 
@@ -282,7 +285,7 @@ def checking(request:HttpRequest, page:int=1):
         cic_buf = {'risk': i_cic}
         risk_list = exam.values('risk').distinct()
         cic_buf['risk_list'] = Risk.objects.filter(id__in=risk_list)
-        imns_list =exam.values('obj').distinct()
+        imns_list = exam.values('obj').distinct()
         cic_buf['imns_list'] = Imns.objects.filter(id__in=imns_list)
         dep_list = exam.values('department').distinct()
         cic_buf['dep_list'] = Department.objects.filter(id__in=dep_list)
